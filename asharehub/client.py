@@ -14,7 +14,7 @@ from asharehub.models import (
     FinaIndicator,
 )
 
-DEFAULT_BASE_URL = "https://api.asharehub.com"
+DEFAULT_BASE_URL = "https://asharehub.com"
 
 
 class AShareHub:
@@ -57,7 +57,7 @@ class AShareHub:
 
     # ── Market ────────────────────────────────────────────────────────────
 
-    def daily(
+    def market_daily(
         self,
         ts_code: Optional[str] = None,
         start_date: Optional[str] = None,
@@ -89,7 +89,7 @@ class AShareHub:
 
     # ── Flows ─────────────────────────────────────────────────────────────
 
-    def northbound(
+    def northbound_flows(
         self,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
@@ -105,7 +105,7 @@ class AShareHub:
 
     # ── Chips ─────────────────────────────────────────────────────────────
 
-    def chips(
+    def chip_distribution(
         self,
         ts_code: Optional[str] = None,
         start_date: Optional[str] = None,
@@ -122,7 +122,7 @@ class AShareHub:
 
     # ── FX ────────────────────────────────────────────────────────────────
 
-    def fx(
+    def fx_daily(
         self,
         ts_code: Optional[str] = "USDCNH.FXCM",
         start_date: Optional[str] = None,
@@ -139,7 +139,7 @@ class AShareHub:
 
     # ── Indices ───────────────────────────────────────────────────────────
 
-    def indices(
+    def index_daily(
         self,
         ts_code: Optional[str] = "000001.SH",
         start_date: Optional[str] = None,
@@ -156,7 +156,7 @@ class AShareHub:
 
     # ── Financials ────────────────────────────────────────────────────────
 
-    def financials(
+    def financial_indicators(
         self,
         ts_code: Optional[str] = None,
         start_date: Optional[str] = None,
