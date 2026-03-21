@@ -34,8 +34,8 @@ dependencies = [
 [project.urls]
 Homepage = "https://asharehub.com"
 Documentation = "https://asharehub.com/docs"
-Repository = "https://github.com/asharehub/AshareHub"
-"Bug Tracker" = "https://github.com/asharehub/AshareHub/issues"
+Repository = "https://github.com/ChuYiCui1/AshareHub"
+"Bug Tracker" = "https://github.com/ChuYiCui1/AshareHub/issues"
 
 [project.optional-dependencies]
 dev = [
