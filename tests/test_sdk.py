@@ -30,8 +30,8 @@ def client():
 
 
 @requires_server
-def test_daily(client):
-    bars = client.daily(ts_code="000001.SZ", limit=3)
+def test_market_daily(client):
+    bars = client.market_daily(ts_code="000001.SZ", limit=3)
     assert len(bars) > 0
     assert isinstance(bars[0], DailyBar)
     assert bars[0].ts_code == "000001.SZ"
@@ -45,39 +45,39 @@ def test_fundamentals(client):
 
 
 @requires_server
-def test_northbound(client):
-    rows = client.northbound(limit=3)
+def test_northbound_flows(client):
+    rows = client.northbound_flows(limit=3)
     assert len(rows) > 0
     assert isinstance(rows[0], NorthboundFlow)
     assert rows[0].north_money is not None
 
 
 @requires_server
-def test_chips(client):
-    rows = client.chips(ts_code="000001.SZ", limit=3)
+def test_chip_distribution(client):
+    rows = client.chip_distribution(ts_code="000001.SZ", limit=3)
     assert len(rows) > 0
     assert isinstance(rows[0], ChipDistribution)
 
 
 @requires_server
-def test_fx(client):
-    rows = client.fx(limit=3)
+def test_fx_daily(client):
+    rows = client.fx_daily(limit=3)
     assert len(rows) > 0
     assert isinstance(rows[0], FxDaily)
     assert rows[0].ts_code == "USDCNH.FXCM"
 
 
 @requires_server
-def test_indices(client):
-    rows = client.indices(limit=3)
+def test_index_daily(client):
+    rows = client.index_daily(limit=3)
     assert len(rows) > 0
     assert isinstance(rows[0], IndexDaily)
     assert rows[0].ts_code == "000001.SH"
 
 
 @requires_server
-def test_financials(client):
-    rows = client.financials(ts_code="000001.SZ", limit=3)
+def test_financial_indicators(client):
+    rows = client.financial_indicators(ts_code="000001.SZ", limit=3)
     assert len(rows) > 0
     assert isinstance(rows[0], FinaIndicator)
     assert rows[0].roe is not None

@@ -124,3 +124,147 @@ class FinaIndicator(BaseModel):
     netprofit_yoy: Optional[Decimal] = None
     dt_netprofit_yoy: Optional[Decimal] = None
     rd_exp: Optional[Decimal] = None
+
+
+class MoneyFlow(BaseModel):
+    ts_code: str
+    trade_date: date
+    buy_sm_vol: Optional[int] = None
+    buy_sm_amount: Optional[Decimal] = None
+    sell_sm_vol: Optional[int] = None
+    sell_sm_amount: Optional[Decimal] = None
+    buy_md_vol: Optional[int] = None
+    buy_md_amount: Optional[Decimal] = None
+    sell_md_vol: Optional[int] = None
+    sell_md_amount: Optional[Decimal] = None
+    buy_lg_vol: Optional[int] = None
+    buy_lg_amount: Optional[Decimal] = None
+    sell_lg_vol: Optional[int] = None
+    sell_lg_amount: Optional[Decimal] = None
+    buy_elg_vol: Optional[int] = None
+    buy_elg_amount: Optional[Decimal] = None
+    sell_elg_vol: Optional[int] = None
+    sell_elg_amount: Optional[Decimal] = None
+    net_mf_vol: Optional[int] = None
+    net_mf_amount: Optional[Decimal] = None
+
+
+class NorthboundHolding(BaseModel):
+    trade_date: date
+    ts_code: str
+    name: Optional[str] = None
+    vol: Optional[int] = None
+    ratio: Optional[Decimal] = None
+    exchange: Optional[str] = None
+
+
+class MarginDetail(BaseModel):
+    trade_date: date
+    ts_code: str
+    name: Optional[str] = None
+    rzye: Optional[Decimal] = None
+    rqye: Optional[Decimal] = None
+    rzmre: Optional[Decimal] = None
+    rqyl: Optional[Decimal] = None
+    rzche: Optional[Decimal] = None
+    rqchl: Optional[Decimal] = None
+    rqmcl: Optional[Decimal] = None
+    rzrqye: Optional[Decimal] = None
+
+
+class BlockTrade(BaseModel):
+    ts_code: str
+    trade_date: date
+    price: Optional[Decimal] = None
+    vol: Optional[Decimal] = None
+    amount: Optional[Decimal] = None
+    buyer: Optional[str] = None
+    seller: Optional[str] = None
+
+
+class TopList(BaseModel):
+    trade_date: date
+    ts_code: str
+    name: Optional[str] = None
+    close: Optional[Decimal] = None
+    pct_change: Optional[Decimal] = None
+    turnover_rate: Optional[Decimal] = None
+    amount: Optional[Decimal] = None
+    l_sell: Optional[Decimal] = None
+    l_buy: Optional[Decimal] = None
+    l_amount: Optional[Decimal] = None
+
+
+class ShareholderNumber(BaseModel):
+    ts_code: str
+    ann_date: Optional[date] = None
+    end_date: date
+    holder_num: Optional[int] = None
+
+
+class HolderTrade(BaseModel):
+    ts_code: str
+    ann_date: date
+    holder_name: Optional[str] = None
+    holder_type: Optional[str] = None
+    in_de: Optional[str] = None
+    change_vol: Optional[Decimal] = None
+    change_ratio: Optional[Decimal] = None
+    after_share: Optional[Decimal] = None
+    after_ratio: Optional[Decimal] = None
+    avg_price: Optional[Decimal] = None
+    total_share: Optional[Decimal] = None
+    begin_date: Optional[date] = None
+    close_date: Optional[date] = None
+
+
+class ConceptIndex(BaseModel):
+    ts_code: str
+    trade_date: date
+    name: Optional[str] = None
+    leading: Optional[str] = None
+    leading_code: Optional[str] = None
+    pct_change: Optional[Decimal] = None
+    leading_pct: Optional[Decimal] = None
+    total_mv: Optional[Decimal] = None
+    turnover_rate: Optional[Decimal] = None
+    up_num: Optional[int] = None
+    down_num: Optional[int] = None
+    idx_type: Optional[str] = None
+    level: Optional[str] = None
+
+
+class ConceptMember(BaseModel):
+    trade_date: date
+    ts_code: str
+    con_code: str
+    name: Optional[str] = None
+
+
+class StockBasic(BaseModel):
+    ts_code: str
+    symbol: Optional[str] = None
+    name: Optional[str] = None
+    area: Optional[str] = None
+    industry: Optional[str] = None
+    fullname: Optional[str] = None
+    enname: Optional[str] = None
+    cnspell: Optional[str] = None
+    market: Optional[str] = None
+    exchange: Optional[str] = None
+    curr_type: Optional[str] = None
+    list_status: Optional[str] = None
+    list_date: Optional[date] = None
+    delist_date: Optional[date] = None
+    is_hs: Optional[str] = None
+
+
+class IndustryClassification(BaseModel):
+    ts_code: str
+    name: Optional[str] = None
+    l1_code: Optional[str] = None
+    l1_name: Optional[str] = None
+    l2_code: Optional[str] = None
+    l2_name: Optional[str] = None
+    l3_code: Optional[str] = None
+    l3_name: Optional[str] = None
