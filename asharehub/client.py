@@ -23,6 +23,17 @@ from asharehub.models import (
     ConceptMember,
     StockBasic,
     IndustryClassification,
+    AdjFactor,
+    StkFactor,
+    LimitList,
+    IncomeStatement,
+    BalanceSheet,
+    CashFlow,
+    Forecast,
+    Express,
+    Dividend,
+    IndexWeight,
+    TradeCalendar,
 )
 
 DEFAULT_BASE_URL = "https://asharehub.com"
@@ -362,3 +373,194 @@ class AShareHub:
             "ts_code": ts_code, "limit": limit, "offset": offset,
         })
         return [IndustryClassification(**row) for row in data]
+
+    # ── Adjustment Factor ─────────────────────────────────────────────────
+
+    def adj_factor(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[AdjFactor]:
+        """Get daily adjustment factor for forward/backward price restoration."""
+        data = self._get("/v1/market/adj-factor", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [AdjFactor(**row) for row in data]
+
+    # ── Technical Factors ─────────────────────────────────────────────────
+
+    def technical_factors(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[StkFactor]:
+        """Get technical indicators (MACD, KDJ, RSI, BOLL, CCI) and adjusted prices."""
+        data = self._get("/v1/market/technical-factors", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [StkFactor(**row) for row in data]
+
+    # ── Limit List ────────────────────────────────────────────────────────
+
+    def limit_list(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit_type: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[LimitList]:
+        """Get daily limit-up/limit-down stocks (涨跌停)."""
+        data = self._get("/v1/market/limit-list", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit_type": limit_type,
+            "limit": limit, "offset": offset,
+        })
+        return [LimitList(**row) for row in data]
+
+    # ── Income Statement ──────────────────────────────────────────────────
+
+    def income(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> list[IncomeStatement]:
+        """Get income statement data."""
+        data = self._get("/v1/financials/income", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [IncomeStatement(**row) for row in data]
+
+    # ── Balance Sheet ─────────────────────────────────────────────────────
+
+    def balance_sheet(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> list[BalanceSheet]:
+        """Get balance sheet data."""
+        data = self._get("/v1/financials/balance-sheet", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [BalanceSheet(**row) for row in data]
+
+    # ── Cash Flow ─────────────────────────────────────────────────────────
+
+    def cash_flow(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> list[CashFlow]:
+        """Get cash flow statement data."""
+        data = self._get("/v1/financials/cash-flow", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [CashFlow(**row) for row in data]
+
+    # ── Forecast ──────────────────────────────────────────────────────────
+
+    def forecast(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[Forecast]:
+        """Get earnings forecast (业绩预告) data."""
+        data = self._get("/v1/financials/forecast", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [Forecast(**row) for row in data]
+
+    # ── Express ───────────────────────────────────────────────────────────
+
+    def express(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[Express]:
+        """Get earnings express (业绩快报) data."""
+        data = self._get("/v1/financials/express", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [Express(**row) for row in data]
+
+    # ── Dividend ──────────────────────────────────────────────────────────
+
+    def dividend(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[Dividend]:
+        """Get dividend and bonus share distribution data."""
+        data = self._get("/v1/shareholders/dividend", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [Dividend(**row) for row in data]
+
+    # ── Index Weight ──────────────────────────────────────────────────────
+
+    def index_weight(
+        self,
+        index_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[IndexWeight]:
+        """Get index constituent stock weights."""
+        data = self._get("/v1/indices/index-weight", {
+            "index_code": index_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+        return [IndexWeight(**row) for row in data]
+
+    # ── Trade Calendar ────────────────────────────────────────────────────
+
+    def trade_calendar(
+        self,
+        exchange: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        is_open: Optional[int] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[TradeCalendar]:
+        """Get trading calendar for SSE/SZSE."""
+        data = self._get("/v1/reference/trade-calendar", {
+            "exchange": exchange, "start_date": start_date,
+            "end_date": end_date, "is_open": is_open,
+            "limit": limit, "offset": offset,
+        })
+        return [TradeCalendar(**row) for row in data]
