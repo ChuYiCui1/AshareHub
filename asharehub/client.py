@@ -3,38 +3,7 @@
 from typing import Optional
 
 import httpx
-
-from asharehub.models import (
-    DailyBar,
-    Fundamentals,
-    NorthboundFlow,
-    ChipDistribution,
-    FxDaily,
-    IndexDaily,
-    FinaIndicator,
-    MoneyFlow,
-    NorthboundHolding,
-    MarginDetail,
-    BlockTrade,
-    TopList,
-    ShareholderNumber,
-    HolderTrade,
-    ConceptIndex,
-    ConceptMember,
-    StockBasic,
-    IndustryClassification,
-    AdjFactor,
-    StkFactor,
-    LimitList,
-    IncomeStatement,
-    BalanceSheet,
-    CashFlow,
-    Forecast,
-    Express,
-    Dividend,
-    IndexWeight,
-    TradeCalendar,
-)
+import pandas as pd
 
 DEFAULT_BASE_URL = "https://asharehub.com"
 
@@ -47,7 +16,7 @@ class AShareHub:
         from asharehub import AShareHub
 
         client = AShareHub(api_key="ash_...")
-        bars = client.daily("000001.SZ", start_date="2024-01-01")
+        df = client.market_daily(ts_code="000001.SZ", start_date="2024-01-01")
     """
 
     def __init__(
@@ -71,11 +40,14 @@ class AShareHub:
     def __exit__(self, *args):
         self.close()
 
-    def _get(self, path: str, params: dict) -> list[dict]:
+    def _get(self, path: str, params: dict) -> pd.DataFrame:
         params = {k: v for k, v in params.items() if v is not None}
         r = self._client.get(path, params=params)
         r.raise_for_status()
-        return r.json()
+        data = r.json()
+        if not data:
+            return pd.DataFrame()
+        return pd.DataFrame(data)
 
     # ── Market ────────────────────────────────────────────────────────────
 
@@ -86,13 +58,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[DailyBar]:
+    ) -> pd.DataFrame:
         """Get daily OHLC price data."""
-        data = self._get("/v1/market/daily", {
+        return self._get("/v1/market/daily", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [DailyBar(**row) for row in data]
 
     def fundamentals(
         self,
@@ -101,13 +72,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[Fundamentals]:
+    ) -> pd.DataFrame:
         """Get daily valuation metrics (PE, PB, turnover rate, market cap)."""
-        data = self._get("/v1/market/fundamentals", {
+        return self._get("/v1/market/fundamentals", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [Fundamentals(**row) for row in data]
 
     # ── Flows ─────────────────────────────────────────────────────────────
 
@@ -117,13 +87,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[NorthboundFlow]:
+    ) -> pd.DataFrame:
         """Get northbound capital flows (Stock Connect)."""
-        data = self._get("/v1/flows/northbound", {
+        return self._get("/v1/flows/northbound", {
             "start_date": start_date, "end_date": end_date,
             "limit": limit, "offset": offset,
         })
-        return [NorthboundFlow(**row) for row in data]
 
     # ── Chips ─────────────────────────────────────────────────────────────
 
@@ -134,13 +103,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[ChipDistribution]:
+    ) -> pd.DataFrame:
         """Get chip distribution (cost basis) data."""
-        data = self._get("/v1/chips/distribution", {
+        return self._get("/v1/chips/distribution", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [ChipDistribution(**row) for row in data]
 
     # ── FX ────────────────────────────────────────────────────────────────
 
@@ -151,13 +119,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[FxDaily]:
+    ) -> pd.DataFrame:
         """Get daily FX rates (default: USD/CNH)."""
-        data = self._get("/v1/fx/daily", {
+        return self._get("/v1/fx/daily", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [FxDaily(**row) for row in data]
 
     # ── Indices ───────────────────────────────────────────────────────────
 
@@ -168,13 +135,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[IndexDaily]:
+    ) -> pd.DataFrame:
         """Get daily index data (default: SSE Composite)."""
-        data = self._get("/v1/indices/daily", {
+        return self._get("/v1/indices/daily", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [IndexDaily(**row) for row in data]
 
     # ── Financials ────────────────────────────────────────────────────────
 
@@ -185,13 +151,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> list[FinaIndicator]:
+    ) -> pd.DataFrame:
         """Get financial indicators by reporting period."""
-        data = self._get("/v1/financials/indicators", {
+        return self._get("/v1/financials/indicators", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [FinaIndicator(**row) for row in data]
 
     # ── Money Flow ─────────────────────────────────────────────────────────
 
@@ -202,13 +167,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[MoneyFlow]:
+    ) -> pd.DataFrame:
         """Get individual stock money flow by order size."""
-        data = self._get("/v1/flows/moneyflow", {
+        return self._get("/v1/flows/moneyflow", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [MoneyFlow(**row) for row in data]
 
     # ── Northbound Holdings ────────────────────────────────────────────────
 
@@ -219,13 +183,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[NorthboundHolding]:
+    ) -> pd.DataFrame:
         """Get northbound investor holdings per stock."""
-        data = self._get("/v1/flows/northbound-holdings", {
+        return self._get("/v1/flows/northbound-holdings", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [NorthboundHolding(**row) for row in data]
 
     # ── Margin ─────────────────────────────────────────────────────────────
 
@@ -236,13 +199,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[MarginDetail]:
+    ) -> pd.DataFrame:
         """Get margin trading detail (融资融券)."""
-        data = self._get("/v1/market/margin", {
+        return self._get("/v1/market/margin", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [MarginDetail(**row) for row in data]
 
     # ── Block Trade ────────────────────────────────────────────────────────
 
@@ -253,13 +215,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[BlockTrade]:
+    ) -> pd.DataFrame:
         """Get block trade (大宗交易) data."""
-        data = self._get("/v1/market/block-trade", {
+        return self._get("/v1/market/block-trade", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [BlockTrade(**row) for row in data]
 
     # ── Top List ───────────────────────────────────────────────────────────
 
@@ -270,13 +231,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[TopList]:
+    ) -> pd.DataFrame:
         """Get Dragon & Tiger list (龙虎榜) data."""
-        data = self._get("/v1/market/top-list", {
+        return self._get("/v1/market/top-list", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [TopList(**row) for row in data]
 
     # ── Shareholders ───────────────────────────────────────────────────────
 
@@ -287,13 +247,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[ShareholderNumber]:
+    ) -> pd.DataFrame:
         """Get shareholder count (股东户数)."""
-        data = self._get("/v1/market/shareholders", {
+        return self._get("/v1/market/shareholders", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [ShareholderNumber(**row) for row in data]
 
     # ── Holder Trade ───────────────────────────────────────────────────────
 
@@ -304,13 +263,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[HolderTrade]:
+    ) -> pd.DataFrame:
         """Get major shareholder trades (股东增减持)."""
-        data = self._get("/v1/market/holder-trade", {
+        return self._get("/v1/market/holder-trade", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [HolderTrade(**row) for row in data]
 
     # ── Concepts ───────────────────────────────────────────────────────────
 
@@ -321,13 +279,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[ConceptIndex]:
+    ) -> pd.DataFrame:
         """Get concept/theme sector indices (概念板块)."""
-        data = self._get("/v1/market/concepts", {
+        return self._get("/v1/market/concepts", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [ConceptIndex(**row) for row in data]
 
     # ── Concept Members ────────────────────────────────────────────────────
 
@@ -339,14 +296,13 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[ConceptMember]:
+    ) -> pd.DataFrame:
         """Get constituent stocks of a concept/theme index."""
-        data = self._get("/v1/market/concept-members", {
+        return self._get("/v1/market/concept-members", {
             "ts_code": ts_code, "con_code": con_code,
             "start_date": start_date, "end_date": end_date,
             "limit": limit, "offset": offset,
         })
-        return [ConceptMember(**row) for row in data]
 
     # ── Reference ──────────────────────────────────────────────────────────
 
@@ -355,24 +311,22 @@ class AShareHub:
         ts_code: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[StockBasic]:
+    ) -> pd.DataFrame:
         """Get A-share stock list with basic info."""
-        data = self._get("/v1/reference/stocks", {
+        return self._get("/v1/reference/stocks", {
             "ts_code": ts_code, "limit": limit, "offset": offset,
         })
-        return [StockBasic(**row) for row in data]
 
     def industry_list(
         self,
         ts_code: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[IndustryClassification]:
+    ) -> pd.DataFrame:
         """Get Shenwan industry classification."""
-        data = self._get("/v1/reference/industries", {
+        return self._get("/v1/reference/industries", {
             "ts_code": ts_code, "limit": limit, "offset": offset,
         })
-        return [IndustryClassification(**row) for row in data]
 
     # ── Adjustment Factor ─────────────────────────────────────────────────
 
@@ -383,13 +337,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[AdjFactor]:
+    ) -> pd.DataFrame:
         """Get daily adjustment factor for forward/backward price restoration."""
-        data = self._get("/v1/market/adj-factor", {
+        return self._get("/v1/market/adj-factor", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [AdjFactor(**row) for row in data]
 
     # ── Technical Factors ─────────────────────────────────────────────────
 
@@ -400,13 +353,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[StkFactor]:
+    ) -> pd.DataFrame:
         """Get technical indicators (MACD, KDJ, RSI, BOLL, CCI) and adjusted prices."""
-        data = self._get("/v1/market/technical-factors", {
+        return self._get("/v1/market/technical-factors", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [StkFactor(**row) for row in data]
 
     # ── Limit List ────────────────────────────────────────────────────────
 
@@ -418,14 +370,13 @@ class AShareHub:
         limit_type: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[LimitList]:
+    ) -> pd.DataFrame:
         """Get daily limit-up/limit-down stocks (涨跌停)."""
-        data = self._get("/v1/market/limit-list", {
+        return self._get("/v1/market/limit-list", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit_type": limit_type,
             "limit": limit, "offset": offset,
         })
-        return [LimitList(**row) for row in data]
 
     # ── Income Statement ──────────────────────────────────────────────────
 
@@ -436,13 +387,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> list[IncomeStatement]:
+    ) -> pd.DataFrame:
         """Get income statement data."""
-        data = self._get("/v1/financials/income", {
+        return self._get("/v1/financials/income", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [IncomeStatement(**row) for row in data]
 
     # ── Balance Sheet ─────────────────────────────────────────────────────
 
@@ -453,13 +403,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> list[BalanceSheet]:
+    ) -> pd.DataFrame:
         """Get balance sheet data."""
-        data = self._get("/v1/financials/balance-sheet", {
+        return self._get("/v1/financials/balance-sheet", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [BalanceSheet(**row) for row in data]
 
     # ── Cash Flow ─────────────────────────────────────────────────────────
 
@@ -470,13 +419,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> list[CashFlow]:
+    ) -> pd.DataFrame:
         """Get cash flow statement data."""
-        data = self._get("/v1/financials/cash-flow", {
+        return self._get("/v1/financials/cash-flow", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [CashFlow(**row) for row in data]
 
     # ── Forecast ──────────────────────────────────────────────────────────
 
@@ -487,13 +435,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 50,
         offset: int = 0,
-    ) -> list[Forecast]:
+    ) -> pd.DataFrame:
         """Get earnings forecast (业绩预告) data."""
-        data = self._get("/v1/financials/forecast", {
+        return self._get("/v1/financials/forecast", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [Forecast(**row) for row in data]
 
     # ── Express ───────────────────────────────────────────────────────────
 
@@ -504,13 +451,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 50,
         offset: int = 0,
-    ) -> list[Express]:
+    ) -> pd.DataFrame:
         """Get earnings express (业绩快报) data."""
-        data = self._get("/v1/financials/express", {
+        return self._get("/v1/financials/express", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [Express(**row) for row in data]
 
     # ── Dividend ──────────────────────────────────────────────────────────
 
@@ -521,13 +467,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 50,
         offset: int = 0,
-    ) -> list[Dividend]:
+    ) -> pd.DataFrame:
         """Get dividend and bonus share distribution data."""
-        data = self._get("/v1/shareholders/dividend", {
+        return self._get("/v1/shareholders/dividend", {
             "ts_code": ts_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [Dividend(**row) for row in data]
 
     # ── Index Weight ──────────────────────────────────────────────────────
 
@@ -538,13 +483,12 @@ class AShareHub:
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[IndexWeight]:
+    ) -> pd.DataFrame:
         """Get index constituent stock weights."""
-        data = self._get("/v1/indices/index-weight", {
+        return self._get("/v1/indices/index-weight", {
             "index_code": index_code, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
-        return [IndexWeight(**row) for row in data]
 
     # ── Trade Calendar ────────────────────────────────────────────────────
 
@@ -556,11 +500,10 @@ class AShareHub:
         is_open: Optional[int] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> list[TradeCalendar]:
+    ) -> pd.DataFrame:
         """Get trading calendar for SSE/SZSE."""
-        data = self._get("/v1/reference/trade-calendar", {
+        return self._get("/v1/reference/trade-calendar", {
             "exchange": exchange, "start_date": start_date,
             "end_date": end_date, "is_open": is_open,
             "limit": limit, "offset": offset,
         })
-        return [TradeCalendar(**row) for row in data]

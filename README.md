@@ -19,12 +19,11 @@
 AShareHub provides institutional-grade Chinese A-Share market data through a simple, modern Python SDK. Access real-time and historical data for 5,000+ stocks on Shanghai and Shenzhen exchanges.
 
 **Key Features:**
-- 🚀 Simple, intuitive API
-- 📊 Comprehensive market data coverage
-- 🔒 Secure authentication
-- ⚡ Fast and reliable
-- 📈 10+ years of historical data
-- 🐍 Type-safe with Pydantic models
+- Returns `pd.DataFrame` — same convention as Tushare
+- 29 data endpoints covering market, financial, and reference data
+- 10+ years of historical data
+- Secure API key authentication
+- Fast and reliable
 
 ---
 
@@ -34,7 +33,7 @@ AShareHub provides institutional-grade Chinese A-Share market data through a sim
 pip install asharehub
 ```
 
-**Requirements:** Python 3.10+
+**Requirements:** Python 3.10+, pandas
 
 ---
 
@@ -43,144 +42,105 @@ pip install asharehub
 ```python
 from asharehub import AShareHub
 
-# Initialize client
 client = AShareHub(api_key="ash_your_key_here")
 
-# Get daily market data
-data = client.market_daily(
-    ts_code="000001.SZ",
-    start_date="2024-01-01",
-    end_date="2024-12-31",
-    limit=100
-)
+# Get daily market data — returns pd.DataFrame
+df = client.market_daily(ts_code="000001.SZ", start_date="2024-01-01", end_date="2024-12-31")
+print(df[["trade_date", "open", "high", "low", "close", "vol"]])
 
-# Access data
-for bar in data:
-    print(f"{bar.trade_date}: {bar.close}")
+client.close()
 ```
 
 ---
 
 ## API Methods
 
+All methods return `pd.DataFrame`. Empty results return an empty DataFrame (`df.empty == True`).
+
 ### Market Data
 
-#### `market_daily()`
-Get daily OHLCV price data for A-share stocks.
-
 ```python
-data = client.market_daily(
-    ts_code="000001.SZ",      # Stock code (optional)
-    start_date="2024-01-01",  # Start date (optional)
-    end_date="2024-12-31",    # End date (optional)
-    limit=100,                # Max rows (default: 100)
-    offset=0                  # Pagination offset (default: 0)
-)
+df = client.market_daily(ts_code="000001.SZ", start_date="2024-01-01")
+df = client.fundamentals(ts_code="000001.SZ", start_date="2024-01-01")
+df = client.margin(ts_code="000001.SZ", limit=100)
+df = client.block_trade(ts_code="000001.SZ", limit=100)
+df = client.top_list(limit=100)
+df = client.shareholders(ts_code="000001.SZ", limit=100)
+df = client.holder_trade(ts_code="000001.SZ", limit=100)
+df = client.concepts(limit=100)
+df = client.concept_members(ts_code="TS2", limit=100)
+df = client.adj_factor(ts_code="000001.SZ", limit=100)
+df = client.technical_factors(ts_code="000001.SZ", limit=100)
+df = client.limit_list(limit_type="U", limit=100)
 ```
-
-**Returns:** List of `DailyBar` objects with fields: `ts_code`, `trade_date`, `open`, `high`, `low`, `close`, `pre_close`, `change`, `pct_chg`, `vol`, `amount`
-
-#### `fundamentals()`
-Get daily fundamental indicators (PE, PB, turnover rate, market cap).
-
-```python
-data = client.fundamentals(
-    ts_code="000001.SZ",
-    start_date="2024-01-01",
-    limit=100
-)
-```
-
-**Returns:** List of `Fundamentals` objects with valuation metrics
-
----
 
 ### Capital Flows
 
-#### `northbound_flows()`
-Get northbound capital flows via Stock Connect (Shanghai-HK and Shenzhen-HK).
-
 ```python
-flows = client.northbound_flows(
-    start_date="2024-01-01",
-    end_date="2024-01-31",
-    limit=100
-)
+df = client.northbound_flows(start_date="2024-01-01", limit=100)
+df = client.moneyflow(ts_code="000001.SZ", limit=100)
+df = client.northbound_holdings(ts_code="000001.SZ", limit=100)
 ```
-
-**Returns:** List of `NorthboundFlow` objects with fields: `trade_date`, `north_money`, `south_money`, `ggt_ss`, `ggt_sz`
-
----
 
 ### Financials
 
-#### `financial_indicators()`
-Get quarterly financial indicators (ROE, margins, EPS, 50+ metrics).
-
 ```python
-financials = client.financial_indicators(
-    ts_code="000001.SZ",art_date="2024-01-01",
-    limit=20
-)
+df = client.financial_indicators(ts_code="000001.SZ", limit=20)
+df = client.income(ts_code="000001.SZ", limit=20)
+df = client.balance_sheet(ts_code="000001.SZ", limit=20)
+df = client.cash_flow(ts_code="000001.SZ", limit=20)
+df = client.forecast(ts_code="000001.SZ", limit=50)
+df = client.express(ts_code="000001.SZ", limit=50)
+df = client.dividend(ts_code="000001.SZ", limit=50)
 ```
-
-**Returns:** List of `FinaIndicator` objects with comprehensive financial metrics
-
----
 
 ### Indices
 
-#### `index_daily()`
-Get daily OHLCV data for major Chinese market indices.
-
 ```python
-indices = client.index_daily(
-    ts_code="000001.SH",  # Default: SSE Composite
-    start_date="2024-01-01",
-    limit=100
-)
+df = client.index_daily(ts_code="000300.SH", start_date="2024-01-01")
+df = client.index_weight(index_code="399300.SZ", limit=100)
 ```
 
-**Common Index Codes:**
-- `000001.SH` - SSE Composite (上证综指)
-- `000300.SH` - CSI 300 (沪深300)
-- `399001.SZ` - SZSE Component (深证成指)
-- `399006.SZ` - ChiNext (创业板指)
-- `000016.SH` - SSE 50 (上证50)
-
----
-
-### Microstructure
-
-#### `chip_distribution()`
-Get chip distribution data (cost basis and winner rates).
+### Other
 
 ```python
-chips = client.chip_distribution(
-    ts_code="000001.SZ",
-    start_date="2024-01-01",
-    limit=100
-)
+df = client.chip_distribution(ts_code="000001.SZ", limit=100)
+df = client.fx_daily(ts_code="USDCNH.FXCM", limit=100)
 ```
-
-**Returns:** List of `ChipDistribution` objects with cost percentiles and winner rates
-
----
 
 ### Reference Data
 
-#### `fx_daily()`
-Get daily FX rates with bid/ask prices.
-
 ```python
-fx = client.fx_daily(
-    ts_code="USDCNH.FXCM",  # Default: USD/CNH
-    start_date="2024-01-01",
-    limit=100
-)
+df = client.stock_list(limit=100)
+df = client.industry_list(limit=100)
+df = client.trade_calendar(exchange="SSE", start_date="2024-01-01")
 ```
 
-**Returns:** List of `FxDaily` objectsth bid/ask OHLC data
+---
+
+## Common Parameters
+
+All data methods accept:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `ts_code` | str | Stock/index code, e.g. `000001.SZ` |
+| `start_date` | str | Start date, `YYYY-MM-DD` |
+| `end_date` | str | End date, `YYYY-MM-DD` |
+| `limit` | int | Max rows per request |
+| `offset` | int | Pagination offset |
+
+---
+
+## Common Index Codes
+
+| Code | Name |
+|------|------|
+| `000001.SH` | SSE Composite (上证综指) |
+| `000300.SH` | CSI 300 (沪深300) |
+| `399001.SZ` | SZSE Component (深证成指) |
+| `399006.SZ` | ChiNext (创业板指) |
+| `000016.SH` | SSE 50 (上证50) |
 
 ---
 
@@ -205,16 +165,14 @@ import httpx
 client = AShareHub(api_key="your_key")
 
 try:
-    data = client.market_daily(ts_code="000001.SZ")
+    df = client.market_daily(ts_code="000001.SZ")
 except httpx.HTTPStatusError as e:
     if e.response.status_code == 401:
         print("Invalid API key")
-    elif e.response.statusde == 429:
+    elif e.response.status_code == 429:
         print("Rate limit exceeded")
     else:
         print(f"HTTP error: {e}")
-except Exception as e:
-    print(f"Error: {e}")
 ```
 
 ---
@@ -225,7 +183,7 @@ except Exception as e:
 
 ```python
 with AShareHub(api_key="your_key") as client:
-    data = client.market_daily(ts_code="000001.SZ")
+    df = client.market_daily(ts_code="000001.SZ")
     # Client automatically closes when exiting context
 ```
 
@@ -245,7 +203,7 @@ client = AShareHub(
 
 | Plan | Price | Daily Limit |
 |------|-------|-------------|
-| | 100 requests |
+| Free | $0 | 100 requests |
 | Pro | $49/month | 10,000 requests |
 | Business | $99/month | 50,000 requests |
 
@@ -253,21 +211,21 @@ client = AShareHub(
 
 ## Support
 
-- 📖 [Documentation](https://asharehub.com/docs)
-- 🐛 [Report Issues](https://github.com/ChuYiCui1/AshareHub/issues)
-- 💬 Email: support@asharehub.com
+- [Documentation](https://asharehub.com/docs)
+- [Report Issues](https://github.com/ChuYiCui1/AshareHub/issues)
+- Email: support@asharehub.com
 
 ---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
 
-**Built with ❤️ for the global investment community**
+**Built for the global investment community**
 
 [asharehub.com](https://asharehub.com)
 

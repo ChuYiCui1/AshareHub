@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "asharehub"
-version = "0.2.0"
-description = "Python SDK for AShareHub — Chinese A-Share market data API (18 endpoints)"
+version = "0.3.0"
+description = "Python SDK for AShareHub — Chinese A-Share market data API (29 endpoints)"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -28,7 +28,7 @@ classifiers = [
 ]
 dependencies = [
     "httpx>=0.27.0",
-    "pydantic>=2.0.0",
+    "pandas>=2.0.0",
 ]
 
 [project.urls]

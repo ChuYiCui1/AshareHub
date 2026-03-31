@@ -1,7 +1,10 @@
-"""Pydantic models matching the AShareHub API response schemas."""
+"""Pydantic models matching the AShareHub API response schemas.
+
+These models document the field names and types for each endpoint.
+The SDK client returns pd.DataFrame directly (not model instances).
+"""
 
 from datetime import date
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -10,143 +13,143 @@ from pydantic import BaseModel
 class DailyBar(BaseModel):
     ts_code: str
     trade_date: date
-    open: Optional[Decimal] = None
-    high: Optional[Decimal] = None
-    low: Optional[Decimal] = None
-    close: Optional[Decimal] = None
-    pre_close: Optional[Decimal] = None
-    change: Optional[Decimal] = None
-    pct_chg: Optional[Decimal] = None
-    vol: Optional[Decimal] = None
-    amount: Optional[Decimal] = None
+    open: Optional[float] = None
+    high: Optional[float] = None
+    low: Optional[float] = None
+    close: Optional[float] = None
+    pre_close: Optional[float] = None
+    change: Optional[float] = None
+    pct_chg: Optional[float] = None
+    vol: Optional[float] = None
+    amount: Optional[float] = None
 
 
 class Fundamentals(BaseModel):
     ts_code: str
     trade_date: date
-    close: Optional[Decimal] = None
-    turnover_rate: Optional[Decimal] = None
-    turnover_rate_f: Optional[Decimal] = None
-    volume_ratio: Optional[Decimal] = None
-    pe: Optional[Decimal] = None
-    pe_ttm: Optional[Decimal] = None
-    pb: Optional[Decimal] = None
-    ps: Optional[Decimal] = None
-    ps_ttm: Optional[Decimal] = None
-    dv_ratio: Optional[Decimal] = None
-    dv_ttm: Optional[Decimal] = None
-    total_share: Optional[Decimal] = None
-    float_share: Optional[Decimal] = None
-    free_share: Optional[Decimal] = None
-    total_mv: Optional[Decimal] = None
-    circ_mv: Optional[Decimal] = None
+    close: Optional[float] = None
+    turnover_rate: Optional[float] = None
+    turnover_rate_f: Optional[float] = None
+    volume_ratio: Optional[float] = None
+    pe: Optional[float] = None
+    pe_ttm: Optional[float] = None
+    pb: Optional[float] = None
+    ps: Optional[float] = None
+    ps_ttm: Optional[float] = None
+    dv_ratio: Optional[float] = None
+    dv_ttm: Optional[float] = None
+    total_share: Optional[float] = None
+    float_share: Optional[float] = None
+    free_share: Optional[float] = None
+    total_mv: Optional[float] = None
+    circ_mv: Optional[float] = None
 
 
 class NorthboundFlow(BaseModel):
     trade_date: date
-    ggt_ss: Optional[Decimal] = None
-    ggt_sz: Optional[Decimal] = None
-    hgt_ss: Optional[Decimal] = None
-    hgt_sz: Optional[Decimal] = None
-    north_money: Optional[Decimal] = None
-    south_money: Optional[Decimal] = None
+    ggt_ss: Optional[float] = None
+    ggt_sz: Optional[float] = None
+    hgt_ss: Optional[float] = None
+    hgt_sz: Optional[float] = None
+    north_money: Optional[float] = None
+    south_money: Optional[float] = None
 
 
 class ChipDistribution(BaseModel):
     ts_code: str
     trade_date: date
-    his_low: Optional[Decimal] = None
-    his_high: Optional[Decimal] = None
-    cost_5pct: Optional[Decimal] = None
-    cost_15pct: Optional[Decimal] = None
-    cost_50pct: Optional[Decimal] = None
-    cost_85pct: Optional[Decimal] = None
-    cost_95pct: Optional[Decimal] = None
-    weight_avg: Optional[Decimal] = None
-    winner_rate: Optional[Decimal] = None
+    his_low: Optional[float] = None
+    his_high: Optional[float] = None
+    cost_5pct: Optional[float] = None
+    cost_15pct: Optional[float] = None
+    cost_50pct: Optional[float] = None
+    cost_85pct: Optional[float] = None
+    cost_95pct: Optional[float] = None
+    weight_avg: Optional[float] = None
+    winner_rate: Optional[float] = None
 
 
 class FxDaily(BaseModel):
     ts_code: str
     trade_date: date
-    bid_open: Optional[Decimal] = None
-    bid_close: Optional[Decimal] = None
-    bid_high: Optional[Decimal] = None
-    bid_low: Optional[Decimal] = None
-    ask_open: Optional[Decimal] = None
-    ask_close: Optional[Decimal] = None
-    ask_high: Optional[Decimal] = None
-    ask_low: Optional[Decimal] = None
+    bid_open: Optional[float] = None
+    bid_close: Optional[float] = None
+    bid_high: Optional[float] = None
+    bid_low: Optional[float] = None
+    ask_open: Optional[float] = None
+    ask_close: Optional[float] = None
+    ask_high: Optional[float] = None
+    ask_low: Optional[float] = None
     tick_qty: Optional[int] = None
 
 
 class IndexDaily(BaseModel):
     ts_code: str
     trade_date: date
-    close: Optional[Decimal] = None
-    open: Optional[Decimal] = None
-    high: Optional[Decimal] = None
-    low: Optional[Decimal] = None
-    pre_close: Optional[Decimal] = None
-    change: Optional[Decimal] = None
-    pct_chg: Optional[Decimal] = None
-    vol: Optional[Decimal] = None
-    amount: Optional[Decimal] = None
+    close: Optional[float] = None
+    open: Optional[float] = None
+    high: Optional[float] = None
+    low: Optional[float] = None
+    pre_close: Optional[float] = None
+    change: Optional[float] = None
+    pct_chg: Optional[float] = None
+    vol: Optional[float] = None
+    amount: Optional[float] = None
 
 
 class FinaIndicator(BaseModel):
     ts_code: str
     ann_date: Optional[date] = None
     end_date: date
-    eps: Optional[Decimal] = None
-    dt_eps: Optional[Decimal] = None
-    total_revenue_ps: Optional[Decimal] = None
-    revenue_ps: Optional[Decimal] = None
-    bps: Optional[Decimal] = None
-    ocfps: Optional[Decimal] = None
-    roe: Optional[Decimal] = None
-    roe_waa: Optional[Decimal] = None
-    roe_dt: Optional[Decimal] = None
-    roa: Optional[Decimal] = None
-    gross_margin: Optional[Decimal] = None
-    netprofit_margin: Optional[Decimal] = None
-    grossprofit_margin: Optional[Decimal] = None
-    debt_to_assets: Optional[Decimal] = None
-    current_ratio: Optional[Decimal] = None
-    quick_ratio: Optional[Decimal] = None
-    cash_ratio: Optional[Decimal] = None
-    assets_turn: Optional[Decimal] = None
-    inv_turn: Optional[Decimal] = None
-    ar_turn: Optional[Decimal] = None
-    roic: Optional[Decimal] = None
-    basic_eps_yoy: Optional[Decimal] = None
-    dt_eps_yoy: Optional[Decimal] = None
-    netprofit_yoy: Optional[Decimal] = None
-    dt_netprofit_yoy: Optional[Decimal] = None
-    rd_exp: Optional[Decimal] = None
+    eps: Optional[float] = None
+    dt_eps: Optional[float] = None
+    total_revenue_ps: Optional[float] = None
+    revenue_ps: Optional[float] = None
+    bps: Optional[float] = None
+    ocfps: Optional[float] = None
+    roe: Optional[float] = None
+    roe_waa: Optional[float] = None
+    roe_dt: Optional[float] = None
+    roa: Optional[float] = None
+    gross_margin: Optional[float] = None
+    netprofit_margin: Optional[float] = None
+    grossprofit_margin: Optional[float] = None
+    debt_to_assets: Optional[float] = None
+    current_ratio: Optional[float] = None
+    quick_ratio: Optional[float] = None
+    cash_ratio: Optional[float] = None
+    assets_turn: Optional[float] = None
+    inv_turn: Optional[float] = None
+    ar_turn: Optional[float] = None
+    roic: Optional[float] = None
+    basic_eps_yoy: Optional[float] = None
+    dt_eps_yoy: Optional[float] = None
+    netprofit_yoy: Optional[float] = None
+    dt_netprofit_yoy: Optional[float] = None
+    rd_exp: Optional[float] = None
 
 
 class MoneyFlow(BaseModel):
     ts_code: str
     trade_date: date
     buy_sm_vol: Optional[int] = None
-    buy_sm_amount: Optional[Decimal] = None
+    buy_sm_amount: Optional[float] = None
     sell_sm_vol: Optional[int] = None
-    sell_sm_amount: Optional[Decimal] = None
+    sell_sm_amount: Optional[float] = None
     buy_md_vol: Optional[int] = None
-    buy_md_amount: Optional[Decimal] = None
+    buy_md_amount: Optional[float] = None
     sell_md_vol: Optional[int] = None
-    sell_md_amount: Optional[Decimal] = None
+    sell_md_amount: Optional[float] = None
     buy_lg_vol: Optional[int] = None
-    buy_lg_amount: Optional[Decimal] = None
+    buy_lg_amount: Optional[float] = None
     sell_lg_vol: Optional[int] = None
-    sell_lg_amount: Optional[Decimal] = None
+    sell_lg_amount: Optional[float] = None
     buy_elg_vol: Optional[int] = None
-    buy_elg_amount: Optional[Decimal] = None
+    buy_elg_amount: Optional[float] = None
     sell_elg_vol: Optional[int] = None
-    sell_elg_amount: Optional[Decimal] = None
+    sell_elg_amount: Optional[float] = None
     net_mf_vol: Optional[int] = None
-    net_mf_amount: Optional[Decimal] = None
+    net_mf_amount: Optional[float] = None
 
 
 class NorthboundHolding(BaseModel):
@@ -154,7 +157,7 @@ class NorthboundHolding(BaseModel):
     ts_code: str
     name: Optional[str] = None
     vol: Optional[int] = None
-    ratio: Optional[Decimal] = None
+    ratio: Optional[float] = None
     exchange: Optional[str] = None
 
 
@@ -162,22 +165,22 @@ class MarginDetail(BaseModel):
     trade_date: date
     ts_code: str
     name: Optional[str] = None
-    rzye: Optional[Decimal] = None
-    rqye: Optional[Decimal] = None
-    rzmre: Optional[Decimal] = None
-    rqyl: Optional[Decimal] = None
-    rzche: Optional[Decimal] = None
-    rqchl: Optional[Decimal] = None
-    rqmcl: Optional[Decimal] = None
-    rzrqye: Optional[Decimal] = None
+    rzye: Optional[float] = None
+    rqye: Optional[float] = None
+    rzmre: Optional[float] = None
+    rqyl: Optional[float] = None
+    rzche: Optional[float] = None
+    rqchl: Optional[float] = None
+    rqmcl: Optional[float] = None
+    rzrqye: Optional[float] = None
 
 
 class BlockTrade(BaseModel):
     ts_code: str
     trade_date: date
-    price: Optional[Decimal] = None
-    vol: Optional[Decimal] = None
-    amount: Optional[Decimal] = None
+    price: Optional[float] = None
+    vol: Optional[float] = None
+    amount: Optional[float] = None
     buyer: Optional[str] = None
     seller: Optional[str] = None
 
@@ -186,13 +189,13 @@ class TopList(BaseModel):
     trade_date: date
     ts_code: str
     name: Optional[str] = None
-    close: Optional[Decimal] = None
-    pct_change: Optional[Decimal] = None
-    turnover_rate: Optional[Decimal] = None
-    amount: Optional[Decimal] = None
-    l_sell: Optional[Decimal] = None
-    l_buy: Optional[Decimal] = None
-    l_amount: Optional[Decimal] = None
+    close: Optional[float] = None
+    pct_change: Optional[float] = None
+    turnover_rate: Optional[float] = None
+    amount: Optional[float] = None
+    l_sell: Optional[float] = None
+    l_buy: Optional[float] = None
+    l_amount: Optional[float] = None
 
 
 class ShareholderNumber(BaseModel):
@@ -208,12 +211,12 @@ class HolderTrade(BaseModel):
     holder_name: Optional[str] = None
     holder_type: Optional[str] = None
     in_de: Optional[str] = None
-    change_vol: Optional[Decimal] = None
-    change_ratio: Optional[Decimal] = None
-    after_share: Optional[Decimal] = None
-    after_ratio: Optional[Decimal] = None
-    avg_price: Optional[Decimal] = None
-    total_share: Optional[Decimal] = None
+    change_vol: Optional[float] = None
+    change_ratio: Optional[float] = None
+    after_share: Optional[float] = None
+    after_ratio: Optional[float] = None
+    avg_price: Optional[float] = None
+    total_share: Optional[float] = None
     begin_date: Optional[date] = None
     close_date: Optional[date] = None
 
@@ -224,10 +227,10 @@ class ConceptIndex(BaseModel):
     name: Optional[str] = None
     leading: Optional[str] = None
     leading_code: Optional[str] = None
-    pct_change: Optional[Decimal] = None
-    leading_pct: Optional[Decimal] = None
-    total_mv: Optional[Decimal] = None
-    turnover_rate: Optional[Decimal] = None
+    pct_change: Optional[float] = None
+    leading_pct: Optional[float] = None
+    total_mv: Optional[float] = None
+    turnover_rate: Optional[float] = None
     up_num: Optional[int] = None
     down_num: Optional[int] = None
     idx_type: Optional[str] = None
@@ -273,36 +276,36 @@ class IndustryClassification(BaseModel):
 class AdjFactor(BaseModel):
     ts_code: str
     trade_date: date
-    adj_factor: Optional[Decimal] = None
+    adj_factor: Optional[float] = None
 
 
 class StkFactor(BaseModel):
     ts_code: str
     trade_date: date
-    open_hfq: Optional[Decimal] = None
-    close_hfq: Optional[Decimal] = None
-    high_hfq: Optional[Decimal] = None
-    low_hfq: Optional[Decimal] = None
-    pre_close_hfq: Optional[Decimal] = None
-    open_qfq: Optional[Decimal] = None
-    close_qfq: Optional[Decimal] = None
-    high_qfq: Optional[Decimal] = None
-    low_qfq: Optional[Decimal] = None
-    pre_close_qfq: Optional[Decimal] = None
-    adj_factor: Optional[Decimal] = None
-    macd_dif: Optional[Decimal] = None
-    macd_dea: Optional[Decimal] = None
-    macd: Optional[Decimal] = None
-    kdj_k: Optional[Decimal] = None
-    kdj_d: Optional[Decimal] = None
-    kdj_j: Optional[Decimal] = None
-    rsi_6: Optional[Decimal] = None
-    rsi_12: Optional[Decimal] = None
-    rsi_24: Optional[Decimal] = None
-    boll_upper: Optional[Decimal] = None
-    boll_mid: Optional[Decimal] = None
-    boll_lower: Optional[Decimal] = None
-    cci: Optional[Decimal] = None
+    open_hfq: Optional[float] = None
+    close_hfq: Optional[float] = None
+    high_hfq: Optional[float] = None
+    low_hfq: Optional[float] = None
+    pre_close_hfq: Optional[float] = None
+    open_qfq: Optional[float] = None
+    close_qfq: Optional[float] = None
+    high_qfq: Optional[float] = None
+    low_qfq: Optional[float] = None
+    pre_close_qfq: Optional[float] = None
+    adj_factor: Optional[float] = None
+    macd_dif: Optional[float] = None
+    macd_dea: Optional[float] = None
+    macd: Optional[float] = None
+    kdj_k: Optional[float] = None
+    kdj_d: Optional[float] = None
+    kdj_j: Optional[float] = None
+    rsi_6: Optional[float] = None
+    rsi_12: Optional[float] = None
+    rsi_24: Optional[float] = None
+    boll_upper: Optional[float] = None
+    boll_mid: Optional[float] = None
+    boll_lower: Optional[float] = None
+    cci: Optional[float] = None
 
 
 class LimitList(BaseModel):
@@ -310,14 +313,14 @@ class LimitList(BaseModel):
     ts_code: str
     industry: Optional[str] = None
     name: Optional[str] = None
-    close: Optional[Decimal] = None
-    pct_chg: Optional[Decimal] = None
-    amount: Optional[Decimal] = None
-    limit_amount: Optional[Decimal] = None
-    float_mv: Optional[Decimal] = None
-    total_mv: Optional[Decimal] = None
-    turnover_ratio: Optional[Decimal] = None
-    fd_amount: Optional[Decimal] = None
+    close: Optional[float] = None
+    pct_chg: Optional[float] = None
+    amount: Optional[float] = None
+    limit_amount: Optional[float] = None
+    float_mv: Optional[float] = None
+    total_mv: Optional[float] = None
+    turnover_ratio: Optional[float] = None
+    fd_amount: Optional[float] = None
     first_time: Optional[str] = None
     last_time: Optional[str] = None
     open_times: Optional[int] = None
@@ -333,25 +336,25 @@ class IncomeStatement(BaseModel):
     end_date: date
     report_type: Optional[str] = None
     comp_type: Optional[str] = None
-    basic_eps: Optional[Decimal] = None
-    diluted_eps: Optional[Decimal] = None
-    total_revenue: Optional[Decimal] = None
-    revenue: Optional[Decimal] = None
-    total_cogs: Optional[Decimal] = None
-    oper_cost: Optional[Decimal] = None
-    sell_exp: Optional[Decimal] = None
-    admin_exp: Optional[Decimal] = None
-    fin_exp: Optional[Decimal] = None
-    rd_exp: Optional[Decimal] = None
-    operate_profit: Optional[Decimal] = None
-    non_oper_income: Optional[Decimal] = None
-    non_oper_exp: Optional[Decimal] = None
-    total_profit: Optional[Decimal] = None
-    income_tax: Optional[Decimal] = None
-    n_income: Optional[Decimal] = None
-    n_income_attr_p: Optional[Decimal] = None
-    ebit: Optional[Decimal] = None
-    ebitda: Optional[Decimal] = None
+    basic_eps: Optional[float] = None
+    diluted_eps: Optional[float] = None
+    total_revenue: Optional[float] = None
+    revenue: Optional[float] = None
+    total_cogs: Optional[float] = None
+    oper_cost: Optional[float] = None
+    sell_exp: Optional[float] = None
+    admin_exp: Optional[float] = None
+    fin_exp: Optional[float] = None
+    rd_exp: Optional[float] = None
+    operate_profit: Optional[float] = None
+    non_oper_income: Optional[float] = None
+    non_oper_exp: Optional[float] = None
+    total_profit: Optional[float] = None
+    income_tax: Optional[float] = None
+    n_income: Optional[float] = None
+    n_income_attr_p: Optional[float] = None
+    ebit: Optional[float] = None
+    ebitda: Optional[float] = None
     update_flag: Optional[str] = None
 
 
@@ -362,30 +365,30 @@ class BalanceSheet(BaseModel):
     end_date: date
     report_type: Optional[str] = None
     comp_type: Optional[str] = None
-    total_cur_assets: Optional[Decimal] = None
-    money_cap: Optional[Decimal] = None
-    notes_receiv: Optional[Decimal] = None
-    accounts_receiv: Optional[Decimal] = None
-    inventories: Optional[Decimal] = None
-    total_nca: Optional[Decimal] = None
-    fa_avail_for_sale: Optional[Decimal] = None
-    lt_eqt_invest: Optional[Decimal] = None
-    fix_assets: Optional[Decimal] = None
-    cip: Optional[Decimal] = None
-    intan_assets: Optional[Decimal] = None
-    goodwill: Optional[Decimal] = None
-    total_assets: Optional[Decimal] = None
-    total_cur_liab: Optional[Decimal] = None
-    st_borr: Optional[Decimal] = None
-    notes_payable: Optional[Decimal] = None
-    acct_payable: Optional[Decimal] = None
-    total_ncl: Optional[Decimal] = None
-    lt_borr: Optional[Decimal] = None
-    bond_payable: Optional[Decimal] = None
-    total_liab: Optional[Decimal] = None
-    total_hldr_eqy_exc_min_int: Optional[Decimal] = None
-    total_hldr_eqy_inc_min_int: Optional[Decimal] = None
-    minority_int: Optional[Decimal] = None
+    total_cur_assets: Optional[float] = None
+    money_cap: Optional[float] = None
+    notes_receiv: Optional[float] = None
+    accounts_receiv: Optional[float] = None
+    inventories: Optional[float] = None
+    total_nca: Optional[float] = None
+    fa_avail_for_sale: Optional[float] = None
+    lt_eqt_invest: Optional[float] = None
+    fix_assets: Optional[float] = None
+    cip: Optional[float] = None
+    intan_assets: Optional[float] = None
+    goodwill: Optional[float] = None
+    total_assets: Optional[float] = None
+    total_cur_liab: Optional[float] = None
+    st_borr: Optional[float] = None
+    notes_payable: Optional[float] = None
+    acct_payable: Optional[float] = None
+    total_ncl: Optional[float] = None
+    lt_borr: Optional[float] = None
+    bond_payable: Optional[float] = None
+    total_liab: Optional[float] = None
+    total_hldr_eqy_exc_min_int: Optional[float] = None
+    total_hldr_eqy_inc_min_int: Optional[float] = None
+    minority_int: Optional[float] = None
     update_flag: Optional[str] = None
 
 
@@ -396,20 +399,20 @@ class CashFlow(BaseModel):
     end_date: date
     report_type: Optional[str] = None
     comp_type: Optional[str] = None
-    net_profit: Optional[Decimal] = None
-    c_fr_sale_sg: Optional[Decimal] = None
-    c_pay_goods_purch_serv_rec: Optional[Decimal] = None
-    n_cashflow_act: Optional[Decimal] = None
-    c_pay_acq_const_fix_intang_oasset: Optional[Decimal] = None
-    c_fr_disp_fix_intang_oasset: Optional[Decimal] = None
-    n_cashflow_inv_act: Optional[Decimal] = None
-    c_fr_borr: Optional[Decimal] = None
-    c_pay_dist_dpcp_int_exp: Optional[Decimal] = None
-    n_cash_flows_fnc_act: Optional[Decimal] = None
-    n_incr_cash_cash_equ: Optional[Decimal] = None
-    c_cash_equ_beg_period: Optional[Decimal] = None
-    c_cash_equ_end_period: Optional[Decimal] = None
-    free_cashflow: Optional[Decimal] = None
+    net_profit: Optional[float] = None
+    c_fr_sale_sg: Optional[float] = None
+    c_pay_goods_purch_serv_rec: Optional[float] = None
+    n_cashflow_act: Optional[float] = None
+    c_pay_acq_const_fix_intang_oasset: Optional[float] = None
+    c_fr_disp_fix_intang_oasset: Optional[float] = None
+    n_cashflow_inv_act: Optional[float] = None
+    c_fr_borr: Optional[float] = None
+    c_pay_dist_dpcp_int_exp: Optional[float] = None
+    n_cash_flows_fnc_act: Optional[float] = None
+    n_incr_cash_cash_equ: Optional[float] = None
+    c_cash_equ_beg_period: Optional[float] = None
+    c_cash_equ_end_period: Optional[float] = None
+    free_cashflow: Optional[float] = None
     update_flag: Optional[str] = None
 
 
@@ -418,11 +421,11 @@ class Forecast(BaseModel):
     ann_date: date
     end_date: date
     type: Optional[str] = None
-    p_change_min: Optional[Decimal] = None
-    p_change_max: Optional[Decimal] = None
-    net_profit_min: Optional[Decimal] = None
-    net_profit_max: Optional[Decimal] = None
-    last_parent_net: Optional[Decimal] = None
+    p_change_min: Optional[float] = None
+    p_change_max: Optional[float] = None
+    net_profit_min: Optional[float] = None
+    net_profit_max: Optional[float] = None
+    last_parent_net: Optional[float] = None
     first_ann_date: Optional[date] = None
     summary: Optional[str] = None
     change_reason: Optional[str] = None
@@ -432,16 +435,16 @@ class Express(BaseModel):
     ts_code: str
     ann_date: date
     end_date: date
-    revenue: Optional[Decimal] = None
-    operate_profit: Optional[Decimal] = None
-    total_profit: Optional[Decimal] = None
-    n_income: Optional[Decimal] = None
-    total_assets: Optional[Decimal] = None
-    total_hldr_eqy_exc_min_int: Optional[Decimal] = None
-    diluted_eps: Optional[Decimal] = None
-    diluted_roe: Optional[Decimal] = None
-    yoy_net_profit: Optional[Decimal] = None
-    bps: Optional[Decimal] = None
+    revenue: Optional[float] = None
+    operate_profit: Optional[float] = None
+    total_profit: Optional[float] = None
+    n_income: Optional[float] = None
+    total_assets: Optional[float] = None
+    total_hldr_eqy_exc_min_int: Optional[float] = None
+    diluted_eps: Optional[float] = None
+    diluted_roe: Optional[float] = None
+    yoy_net_profit: Optional[float] = None
+    bps: Optional[float] = None
     perf_summary: Optional[str] = None
     update_flag: Optional[str] = None
 
@@ -451,11 +454,11 @@ class Dividend(BaseModel):
     end_date: date
     ann_date: Optional[date] = None
     div_proc: Optional[str] = None
-    stk_div: Optional[Decimal] = None
-    stk_bo_rate: Optional[Decimal] = None
-    stk_co_rate: Optional[Decimal] = None
-    cash_div: Optional[Decimal] = None
-    cash_div_tax: Optional[Decimal] = None
+    stk_div: Optional[float] = None
+    stk_bo_rate: Optional[float] = None
+    stk_co_rate: Optional[float] = None
+    cash_div: Optional[float] = None
+    cash_div_tax: Optional[float] = None
     record_date: Optional[date] = None
     ex_date: Optional[date] = None
     pay_date: Optional[date] = None
@@ -468,7 +471,7 @@ class IndexWeight(BaseModel):
     trade_date: date
     con_code: str
     con_name: Optional[str] = None
-    weight: Optional[Decimal] = None
+    weight: Optional[float] = None
 
 
 class TradeCalendar(BaseModel):
