@@ -40,6 +40,26 @@ class AShareHub:
     def __exit__(self, *args):
         self.close()
 
+    # 已知的字符串列，不做数值转换
+    _STR_COLS = {
+        "ts_code", "trade_date", "end_date", "ann_date", "f_ann_date",
+        "report_date", "cal_date", "pretrade_date", "record_date",
+        "ex_date", "pay_date", "div_listdate", "imp_ann_date",
+        "list_date", "delist_date", "begin_date", "close_date",
+        "first_ann_date", "first_time", "last_time",
+        "symbol", "name", "area", "industry", "fullname", "enname",
+        "cnspell", "market", "exchange", "curr_type", "list_status",
+        "is_hs", "report_type", "comp_type", "update_flag",
+        "holder_name", "holder_type", "in_de",
+        "buyer", "seller", "div_proc", "type",
+        "summary", "change_reason", "perf_summary",
+        "con_code", "con_name", "index_code",
+        "leading", "leading_code", "idx_type", "level",
+        "up_stat", "limit",
+        "l1_code", "l1_name", "l2_code", "l2_name",
+        "l3_code", "l3_name",
+    }
+
     def _get(self, path: str, params: dict) -> pd.DataFrame:
         params = {k: v for k, v in params.items() if v is not None}
         r = self._client.get(path, params=params)
@@ -48,7 +68,9 @@ class AShareHub:
         if not data:
             return pd.DataFrame()
         df = pd.DataFrame(data)
-        df = df.apply(pd.to_numeric, errors="ignore")
+        for col in df.columns:
+            if col not in self._STR_COLS:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
         return df
 
     # ── Market ────────────────────────────────────────────────────────────
