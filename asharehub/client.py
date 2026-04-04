@@ -47,7 +47,9 @@ class AShareHub:
         data = r.json()
         if not data:
             return pd.DataFrame()
-        return pd.DataFrame(data)
+        df = pd.DataFrame(data)
+        df = df.apply(pd.to_numeric, errors="ignore")
+        return df
 
     # ── Market ────────────────────────────────────────────────────────────
 
