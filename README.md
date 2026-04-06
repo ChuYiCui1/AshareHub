@@ -77,7 +77,7 @@ df = client.limit_list(limit_type="U", limit=100)
 ### Capital Flows
 
 ```python
-df = client.northbound_flows(start_date="2024-01-01", limit=100)
+df = client.moneyflow_hsgt(start_date="2024-01-01", limit=100)
 df = client.moneyflow(ts_code="000001.SZ", limit=100)
 df = client.northbound_holdings(ts_code="000001.SZ", limit=100)
 ```

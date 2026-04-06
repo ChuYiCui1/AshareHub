@@ -45,7 +45,7 @@ class Fundamentals(BaseModel):
     circ_mv: Optional[float] = None
 
 
-class NorthboundFlow(BaseModel):
+class MoneyflowHsgt(BaseModel):
     trade_date: date
     ggt_ss: Optional[float] = None
     ggt_sz: Optional[float] = None

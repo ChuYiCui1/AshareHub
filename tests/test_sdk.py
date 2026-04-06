@@ -10,7 +10,7 @@ import os
 import pytest
 from asharehub import AShareHub
 from asharehub.models import (
-    DailyBar, Fundamentals, NorthboundFlow,
+    DailyBar, Fundamentals, MoneyflowHsgt,
     ChipDistribution, FxDaily, IndexDaily, FinaIndicator,
 )
 
@@ -45,10 +45,10 @@ def test_fundamentals(client):
 
 
 @requires_server
-def test_northbound_flows(client):
-    rows = client.northbound_flows(limit=3)
+def test_moneyflow_hsgt(client):
+    rows = client.moneyflow_hsgt(limit=3)
     assert len(rows) > 0
-    assert isinstance(rows[0], NorthboundFlow)
+    assert isinstance(rows[0], MoneyflowHsgt)
     assert rows[0].north_money is not None
 
 

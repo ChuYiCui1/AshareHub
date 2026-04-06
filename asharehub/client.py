@@ -105,15 +105,15 @@ class AShareHub:
 
     # ── Flows ─────────────────────────────────────────────────────────────
 
-    def northbound_flows(
+    def moneyflow_hsgt(
         self,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> pd.DataFrame:
-        """Get northbound capital flows (Stock Connect)."""
-        return self._get("/v1/flows/northbound", {
+        """Get Stock Connect capital flows (HSGT, northbound + southbound)."""
+        return self._get("/v1/flows/moneyflow-hsgt", {
             "start_date": start_date, "end_date": end_date,
             "limit": limit, "offset": offset,
         })
