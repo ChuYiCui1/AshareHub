@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "asharehub"
-version = "0.3.2"
+version = "0.3.3"
 description = "Python SDK for AShareHub — Chinese A-Share market data API (29 endpoints)"
 readme = "README.md"
 requires-python = ">=3.10"
