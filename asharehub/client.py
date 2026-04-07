@@ -514,6 +514,118 @@ class AShareHub:
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
+    # ── Technical Factors Pro ─────────────────────────────────────────────
+
+    def technical_factors_pro(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get professional technical factors (200+ indicators with bfq/qfq/hfq variants)."""
+        return self._get("/v1/market/technical-factors-pro", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+
+    # ── Analyst Reports ───────────────────────────────────────────────────
+
+    def analyst_reports(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get sell-side analyst earnings forecasts and ratings."""
+        return self._get("/v1/financials/analyst-reports", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+
+    # ── Top Inst ──────────────────────────────────────────────────────────
+
+    def top_inst(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get Dragon & Tiger list institutional seat detail."""
+        return self._get("/v1/market/top-inst", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+
+    # ── Southbound Holdings ───────────────────────────────────────────────
+
+    def southbound_holdings(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get mainland investor holdings of HK stocks (southbound, 港股通持股)."""
+        return self._get("/v1/flows/southbound-holdings", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+
+    # ── Audit ─────────────────────────────────────────────────────────────
+
+    def audit(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get annual audit opinions (审计意见)."""
+        return self._get("/v1/financials/audit", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+
+    # ── Main Business ─────────────────────────────────────────────────────
+
+    def main_business(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get main business composition by segment (主营业务构成)."""
+        return self._get("/v1/financials/main-business", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+
+    # ── Disclosure Date ───────────────────────────────────────────────────
+
+    def disclosure_date(
+        self,
+        ts_code: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get planned/actual financial disclosure dates."""
+        return self._get("/v1/financials/disclosure-date", {
+            "ts_code": ts_code, "start_date": start_date,
+            "end_date": end_date, "limit": limit, "offset": offset,
+        })
+
     # ── Trade Calendar ────────────────────────────────────────────────────
 
     def trade_calendar(
