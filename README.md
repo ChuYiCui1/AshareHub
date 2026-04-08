@@ -16,7 +16,7 @@
 
 ## Overview
 
-AShareHub provides institutional-grade Chinese A-Share market data through a simple, modern Python SDK. Access real-time and historical data for 5,000+ stocks on Shanghai and Shenzhen exchanges.
+AShareHub provides institutional-grade Chinese A-Share market data through a simple, modern Python SDK. Access real-time and historical data for all listed Chinese A-shares.
 
 **Key Features:**
 - Returns `pd.DataFrame` — same convention as Tushare
