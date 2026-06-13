@@ -5,14 +5,15 @@ Start the API first:
 
 Then run:
     cd sdk && pytest -v
+
+Every client method returns a pandas DataFrame (since v0.3.0), so tests assert
+on DataFrame shape and columns (df.iloc[0]["col"]), not on model-instance
+attributes.
 """
 import os
 import pytest
+import pandas as pd
 from asharehub import AShareHub
-from asharehub.models import (
-    DailyBar, Fundamentals, MoneyflowHsgt,
-    ChipDistribution, FxDaily, IndexDaily, FinaIndicator,
-)
 
 API_KEY = os.getenv("ASHAREHUB_API_KEY", "")
 BASE_URL = os.getenv("ASHAREHUB_BASE_URL", "http://localhost:8000")
@@ -31,53 +32,50 @@ def client():
 
 @requires_server
 def test_market_daily(client):
-    bars = client.market_daily(ts_code="000001.SZ", limit=3)
-    assert len(bars) > 0
-    assert isinstance(bars[0], DailyBar)
-    assert bars[0].ts_code == "000001.SZ"
+    df = client.market_daily(ts_code="000001.SZ", limit=3)
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) > 0
+    assert "close" in df.columns
+    assert df.iloc[0]["ts_code"] == "000001.SZ"
 
 
 @requires_server
 def test_fundamentals(client):
-    rows = client.fundamentals(ts_code="000001.SZ", limit=3)
-    assert len(rows) > 0
-    assert isinstance(rows[0], Fundamentals)
+    df = client.fundamentals(ts_code="000001.SZ", limit=3)
+    assert len(df) > 0
+    assert "pe_ttm" in df.columns
 
 
 @requires_server
 def test_moneyflow_hsgt(client):
-    rows = client.moneyflow_hsgt(limit=3)
-    assert len(rows) > 0
-    assert isinstance(rows[0], MoneyflowHsgt)
-    assert rows[0].north_money is not None
+    df = client.moneyflow_hsgt(limit=3)
+    assert len(df) > 0
+    assert df.iloc[0]["north_money"] is not None
 
 
 @requires_server
 def test_chip_distribution(client):
-    rows = client.chip_distribution(ts_code="000001.SZ", limit=3)
-    assert len(rows) > 0
-    assert isinstance(rows[0], ChipDistribution)
+    df = client.chip_distribution(ts_code="000001.SZ", limit=3)
+    assert len(df) > 0
+    assert "winner_rate" in df.columns
 
 
 @requires_server
 def test_fx_daily(client):
-    rows = client.fx_daily(limit=3)
-    assert len(rows) > 0
-    assert isinstance(rows[0], FxDaily)
-    assert rows[0].ts_code == "USDCNH.FXCM"
+    df = client.fx_daily(limit=3)
+    assert len(df) > 0
+    assert df.iloc[0]["ts_code"] == "USDCNH.FXCM"
 
 
 @requires_server
 def test_index_daily(client):
-    rows = client.index_daily(limit=3)
-    assert len(rows) > 0
-    assert isinstance(rows[0], IndexDaily)
-    assert rows[0].ts_code == "000001.SH"
+    df = client.index_daily(limit=3)
+    assert len(df) > 0
+    assert df.iloc[0]["ts_code"] == "000001.SH"
 
 
 @requires_server
 def test_financial_indicators(client):
-    rows = client.financial_indicators(ts_code="000001.SZ", limit=3)
-    assert len(rows) > 0
-    assert isinstance(rows[0], FinaIndicator)
-    assert rows[0].roe is not None
+    df = client.financial_indicators(ts_code="000001.SZ", limit=3)
+    assert len(df) > 0
+    assert "roe" in df.columns
