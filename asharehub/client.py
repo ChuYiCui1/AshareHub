@@ -47,6 +47,7 @@ class AShareHub:
         "ex_date", "pay_date", "div_listdate", "imp_ann_date",
         "list_date", "delist_date", "begin_date", "close_date",
         "first_ann_date", "first_time", "last_time",
+        "trade_time", "updated_at",
         "symbol", "name", "area", "industry", "fullname", "enname",
         "cnspell", "market", "exchange", "curr_type", "list_status",
         "is_hs", "report_type", "comp_type", "update_flag",
