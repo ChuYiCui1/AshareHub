@@ -643,3 +643,22 @@ class AShareHub:
             "end_date": end_date, "is_open": is_open,
             "limit": limit, "offset": offset,
         })
+
+    # ── Real-time Quote ───────────────────────────────────────────────────
+
+    def realtime(
+        self,
+        ts_code: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get the real-time intraday quote snapshot (latest price per security).
+
+        ``ts_code`` may be a single code or a comma-separated basket of up to 200,
+        e.g. ``"600519.SH,000001.SZ"``. Omit it to page through the whole market.
+        Includes price, OHLC, previous close, pct_chg, cumulative volume/turnover
+        and the source quote timestamp. Continuously refreshed during trading hours.
+        """
+        return self._get("/v1/market/realtime", {
+            "ts_code": ts_code, "limit": limit, "offset": offset,
+        })

@@ -4,7 +4,7 @@ These models document the field names and types for each endpoint.
 The SDK client returns pd.DataFrame directly (not model instances).
 """
 
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from pydantic import BaseModel
@@ -479,3 +479,18 @@ class TradeCalendar(BaseModel):
     cal_date: date
     is_open: int
     pretrade_date: Optional[date] = None
+
+
+class RealtimeQuote(BaseModel):
+    ts_code: str
+    name: Optional[str] = None
+    price: Optional[float] = None
+    open: Optional[float] = None
+    high: Optional[float] = None
+    low: Optional[float] = None
+    pre_close: Optional[float] = None
+    pct_chg: Optional[float] = None
+    volume: Optional[float] = None
+    amount: Optional[float] = None
+    trade_time: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

@@ -20,7 +20,7 @@ AShareHub provides institutional-grade Chinese A-Share market data through a sim
 
 **Key Features:**
 - Returns `pd.DataFrame` — same convention as Tushare
-- 29 data endpoints covering market, financial, and reference data
+- 37 data endpoints covering market, financial, real-time, and reference data
 - 10+ years of historical data
 - Secure API key authentication
 - Fast and reliable
