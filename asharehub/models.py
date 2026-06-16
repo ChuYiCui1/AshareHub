@@ -493,3 +493,12 @@ class RealtimeQuote(BaseModel):
     volume: Optional[float] = None
     amount: Optional[float] = None
     trade_time: Optional[datetime] = None
+
+
+class NewsFlash(BaseModel):
+    source: str
+    publish_time: Optional[datetime] = None
+    content_cn: Optional[str] = None
+    tags: Optional[str] = None
+    importance: Optional[int] = None
+    url: Optional[str] = None

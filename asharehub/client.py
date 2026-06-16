@@ -48,6 +48,7 @@ class AShareHub:
         "list_date", "delist_date", "begin_date", "close_date",
         "first_ann_date", "first_time", "last_time",
         "trade_time", "updated_at",
+        "publish_time", "content_cn", "tags", "url", "source",
         "symbol", "name", "area", "industry", "fullname", "enname",
         "cnspell", "market", "exchange", "curr_type", "list_status",
         "is_hs", "report_type", "comp_type", "update_flag",
@@ -662,4 +663,26 @@ class AShareHub:
         """
         return self._get("/v1/market/realtime", {
             "ts_code": ts_code, "limit": limit, "offset": offset,
+        })
+
+    # ── News Flash ────────────────────────────────────────────────────────
+
+    def news_flash(
+        self,
+        source: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        importance: Optional[int] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Get real-time Chinese financial news flashes (财经快讯).
+
+        ``source`` is required — one feed per call: "cls" (财联社), "jin10" (金十),
+        or "sina" (新浪). Content is Chinese (content_cn). Ordered newest first.
+        Optional: importance (>= filter), start_date/end_date (YYYY-MM-DD on publish_time).
+        """
+        return self._get("/v1/news/flash", {
+            "source": source, "start_date": start_date, "end_date": end_date,
+            "importance": importance, "limit": limit, "offset": offset,
         })
