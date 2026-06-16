@@ -493,4 +493,3 @@ class RealtimeQuote(BaseModel):
     volume: Optional[float] = None
     amount: Optional[float] = None
     trade_time: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
