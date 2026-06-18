@@ -71,8 +71,15 @@ class AShareHub:
             return pd.DataFrame()
         df = pd.DataFrame(data)
         for col in df.columns:
-            if col not in self._STR_COLS:
-                df[col] = pd.to_numeric(df[col], errors="coerce")
+            if col in self._STR_COLS:
+                continue
+            coerced = pd.to_numeric(df[col], errors="coerce")
+            # Safe coercion: if to_numeric turned any real (non-null) value into NaN,
+            # this column is actually text (seat names, reasons, ratings, ...) — keep
+            # it as-is rather than nuking it to NaN. (exalter & co. used to break here.)
+            if (coerced.isna() & df[col].notna()).any():
+                continue
+            df[col] = coerced
         return df
 
     # ── Market ────────────────────────────────────────────────────────────
