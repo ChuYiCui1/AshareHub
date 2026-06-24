@@ -45,7 +45,7 @@ from asharehub import AShareHub
 client = AShareHub(api_key="ash_your_key_here")
 
 # Get daily market data — returns pd.DataFrame
-df = client.market_daily(ts_code="000001.SZ", start_date="2024-01-01", end_date="2024-12-31")
+df = client.market_daily(symbol="000001.SZ", start_date="2024-01-01", end_date="2024-12-31")
 print(df[["trade_date", "open", "high", "low", "close", "vol"]])
 
 client.close()
@@ -60,17 +60,17 @@ All methods return `pd.DataFrame`. Empty results return an empty DataFrame (`df.
 ### Market Data
 
 ```python
-df = client.market_daily(ts_code="000001.SZ", start_date="2024-01-01")
-df = client.fundamentals(ts_code="000001.SZ", start_date="2024-01-01")
-df = client.margin(ts_code="000001.SZ", limit=100)
-df = client.block_trade(ts_code="000001.SZ", limit=100)
+df = client.market_daily(symbol="000001.SZ", start_date="2024-01-01")
+df = client.fundamentals(symbol="000001.SZ", start_date="2024-01-01")
+df = client.margin(symbol="000001.SZ", limit=100)
+df = client.block_trade(symbol="000001.SZ", limit=100)
 df = client.top_list(limit=100)
-df = client.shareholders(ts_code="000001.SZ", limit=100)
-df = client.holder_trade(ts_code="000001.SZ", limit=100)
+df = client.shareholders(symbol="000001.SZ", limit=100)
+df = client.holder_trade(symbol="000001.SZ", limit=100)
 df = client.concepts(limit=100)
-df = client.concept_members(ts_code="TS2", limit=100)
-df = client.adj_factor(ts_code="000001.SZ", limit=100)
-df = client.technical_factors(ts_code="000001.SZ", limit=100)
+df = client.concept_members(symbol="TS2", limit=100)
+df = client.adj_factor(symbol="000001.SZ", limit=100)
+df = client.technical_factors(symbol="000001.SZ", limit=100)
 df = client.limit_list(limit_type="U", limit=100)
 ```
 
@@ -78,34 +78,34 @@ df = client.limit_list(limit_type="U", limit=100)
 
 ```python
 df = client.moneyflow_hsgt(start_date="2024-01-01", limit=100)
-df = client.moneyflow(ts_code="000001.SZ", limit=100)
-df = client.northbound_holdings(ts_code="000001.SZ", limit=100)
+df = client.moneyflow(symbol="000001.SZ", limit=100)
+df = client.northbound_holdings(symbol="000001.SZ", limit=100)
 ```
 
 ### Financials
 
 ```python
-df = client.financial_indicators(ts_code="000001.SZ", limit=20)
-df = client.income(ts_code="000001.SZ", limit=20)
-df = client.balance_sheet(ts_code="000001.SZ", limit=20)
-df = client.cash_flow(ts_code="000001.SZ", limit=20)
-df = client.forecast(ts_code="000001.SZ", limit=50)
-df = client.express(ts_code="000001.SZ", limit=50)
-df = client.dividend(ts_code="000001.SZ", limit=50)
+df = client.financial_indicators(symbol="000001.SZ", limit=20)
+df = client.income(symbol="000001.SZ", limit=20)
+df = client.balance_sheet(symbol="000001.SZ", limit=20)
+df = client.cash_flow(symbol="000001.SZ", limit=20)
+df = client.forecast(symbol="000001.SZ", limit=50)
+df = client.express(symbol="000001.SZ", limit=50)
+df = client.dividend(symbol="000001.SZ", limit=50)
 ```
 
 ### Indices
 
 ```python
-df = client.index_daily(ts_code="000300.SH", start_date="2024-01-01")
-df = client.index_weight(index_code="399300.SZ", limit=100)
+df = client.index_daily(symbol="000300.SH", start_date="2024-01-01")
+df = client.index_weight(symbol="399300.SZ", limit=100)
 ```
 
 ### Other
 
 ```python
-df = client.chip_distribution(ts_code="000001.SZ", limit=100)
-df = client.fx_daily(ts_code="USDCNH.FXCM", limit=100)
+df = client.chip_distribution(symbol="000001.SZ", limit=100)
+df = client.fx_daily(symbol="USDCNH.FXCM", limit=100)
 ```
 
 ### Reference Data
@@ -124,7 +124,7 @@ All data methods accept:
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `ts_code` | str | Stock/index code, e.g. `000001.SZ` |
+| `symbol` | str | Stock/index code, e.g. `000001.SZ` |
 | `start_date` | str | Start date, `YYYY-MM-DD` |
 | `end_date` | str | End date, `YYYY-MM-DD` |
 | `limit` | int | Max rows per request |
@@ -165,7 +165,7 @@ import httpx
 client = AShareHub(api_key="your_key")
 
 try:
-    df = client.market_daily(ts_code="000001.SZ")
+    df = client.market_daily(symbol="000001.SZ")
 except httpx.HTTPStatusError as e:
     if e.response.status_code == 401:
         print("Invalid API key")
@@ -183,7 +183,7 @@ except httpx.HTTPStatusError as e:
 
 ```python
 with AShareHub(api_key="your_key") as client:
-    df = client.market_daily(ts_code="000001.SZ")
+    df = client.market_daily(symbol="000001.SZ")
     # Client automatically closes when exiting context
 ```
 

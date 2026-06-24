@@ -32,7 +32,7 @@ def client():
 
 @requires_server
 def test_market_daily(client):
-    df = client.market_daily(ts_code="000001.SZ", limit=3)
+    df = client.market_daily(symbol="000001.SZ", limit=3)
     assert isinstance(df, pd.DataFrame)
     assert len(df) > 0
     assert "close" in df.columns
@@ -41,7 +41,7 @@ def test_market_daily(client):
 
 @requires_server
 def test_fundamentals(client):
-    df = client.fundamentals(ts_code="000001.SZ", limit=3)
+    df = client.fundamentals(symbol="000001.SZ", limit=3)
     assert len(df) > 0
     assert "pe_ttm" in df.columns
 
@@ -55,7 +55,7 @@ def test_moneyflow_hsgt(client):
 
 @requires_server
 def test_chip_distribution(client):
-    df = client.chip_distribution(ts_code="000001.SZ", limit=3)
+    df = client.chip_distribution(symbol="000001.SZ", limit=3)
     assert len(df) > 0
     assert "winner_rate" in df.columns
 
@@ -76,6 +76,6 @@ def test_index_daily(client):
 
 @requires_server
 def test_financial_indicators(client):
-    df = client.financial_indicators(ts_code="000001.SZ", limit=3)
+    df = client.financial_indicators(symbol="000001.SZ", limit=3)
     assert len(df) > 0
     assert "roe" in df.columns

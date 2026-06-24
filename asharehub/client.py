@@ -16,7 +16,11 @@ class AShareHub:
         from asharehub import AShareHub
 
         client = AShareHub(api_key="ash_...")
-        df = client.market_daily(ts_code="000001.SZ", start_date="2024-01-01")
+        df = client.market_daily(symbol="000001.SZ", start_date="2024-01-01")
+
+    The instrument-code param is ``symbol`` (suffixed, e.g. ``000001.SZ``).
+    With ``version="v2"`` every call hits the /v2 API (which speaks ``symbol``
+    and returns JSON numbers); ``version="v1"`` (default) hits the legacy /v1 API.
     """
 
     def __init__(
@@ -24,7 +28,17 @@ class AShareHub:
         api_key: str,
         base_url: str = DEFAULT_BASE_URL,
         timeout: float = 30.0,
+        version: str = "v1",
     ):
+        """``version="v2"`` switches every call to the unified-symbol /v2 API:
+        bare codes (``000001``) are accepted, responses return a bare ``symbol``
+        plus ``exchange`` instead of ``ts_code``, and an invalid code raises 422.
+        Method signatures are unchanged — ``ts_code=``/``index_code=`` are
+        transparently sent as the v2 ``symbol`` param.
+        """
+        if version not in ("v1", "v2"):
+            raise ValueError("version must be 'v1' or 'v2'")
+        self._version = version
         self._client = httpx.Client(
             base_url=base_url,
             headers={"X-API-Key": api_key},
@@ -56,14 +70,22 @@ class AShareHub:
         "buyer", "seller", "div_proc", "type",
         "summary", "change_reason", "perf_summary",
         "con_code", "con_name", "index_code",
+        "con_symbol", "con_exchange",
         "leading", "leading_code", "idx_type", "level",
         "up_stat", "limit",
         "l1_code", "l1_name", "l2_code", "l2_name",
         "l3_code", "l3_name",
     }
 
+    # v2 unifies instrument-code params under `symbol` / `con_symbol`.
+    _V2_PARAM_RENAME = {"ts_code": "symbol", "index_code": "symbol", "con_code": "con_symbol"}
+
     def _get(self, path: str, params: dict) -> pd.DataFrame:
         params = {k: v for k, v in params.items() if v is not None}
+        if self._version == "v2":
+            if path.startswith("/v1/"):
+                path = "/v2/" + path[len("/v1/"):]
+            params = {self._V2_PARAM_RENAME.get(k, k): v for k, v in params.items()}
         r = self._client.get(path, params=params)
         r.raise_for_status()
         data = r.json()
@@ -75,8 +97,8 @@ class AShareHub:
                 continue
             coerced = pd.to_numeric(df[col], errors="coerce")
             # Safe coercion: if to_numeric turned any real (non-null) value into NaN,
-            # this column is actually text (seat names, reasons, ratings, ...) — keep
-            # it as-is rather than nuking it to NaN. (exalter & co. used to break here.)
+            # this column is actually text (seat names, reasons, ratings, titles, ...) —
+            # keep it as-is rather than nuking it to NaN. (exalter & co. used to break here.)
             if (coerced.isna() & df[col].notna()).any():
                 continue
             df[col] = coerced
@@ -86,7 +108,7 @@ class AShareHub:
 
     def market_daily(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -94,13 +116,13 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get daily OHLC price data."""
         return self._get("/v1/market/daily", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
     def fundamentals(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -108,7 +130,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get daily valuation metrics (PE, PB, turnover rate, market cap)."""
         return self._get("/v1/market/fundamentals", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -131,7 +153,7 @@ class AShareHub:
 
     def chip_distribution(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -139,7 +161,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get chip distribution (cost basis) data."""
         return self._get("/v1/chips/distribution", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -147,7 +169,7 @@ class AShareHub:
 
     def fx_daily(
         self,
-        ts_code: Optional[str] = "USDCNH.FXCM",
+        symbol: Optional[str] = "USDCNH.FXCM",
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -155,7 +177,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get daily FX rates (default: USD/CNH)."""
         return self._get("/v1/fx/daily", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -163,7 +185,7 @@ class AShareHub:
 
     def index_daily(
         self,
-        ts_code: Optional[str] = "000001.SH",
+        symbol: Optional[str] = "000001.SH",
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -171,7 +193,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get daily index data (default: SSE Composite)."""
         return self._get("/v1/indices/daily", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -179,7 +201,7 @@ class AShareHub:
 
     def financial_indicators(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 20,
@@ -187,7 +209,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get financial indicators by reporting period."""
         return self._get("/v1/financials/indicators", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -195,7 +217,7 @@ class AShareHub:
 
     def moneyflow(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -203,7 +225,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get individual stock money flow by order size."""
         return self._get("/v1/flows/moneyflow", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -211,7 +233,7 @@ class AShareHub:
 
     def northbound_holdings(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -219,7 +241,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get northbound investor holdings per stock."""
         return self._get("/v1/flows/northbound-holdings", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -227,7 +249,7 @@ class AShareHub:
 
     def margin(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -235,7 +257,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get margin trading detail (融资融券)."""
         return self._get("/v1/market/margin", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -243,7 +265,7 @@ class AShareHub:
 
     def block_trade(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -251,7 +273,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get block trade (大宗交易) data."""
         return self._get("/v1/market/block-trade", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -259,7 +281,7 @@ class AShareHub:
 
     def top_list(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -267,7 +289,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get Dragon & Tiger list (龙虎榜) data."""
         return self._get("/v1/market/top-list", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -275,7 +297,7 @@ class AShareHub:
 
     def shareholders(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -283,7 +305,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get shareholder count (股东户数)."""
         return self._get("/v1/market/shareholders", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -291,7 +313,7 @@ class AShareHub:
 
     def holder_trade(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -299,7 +321,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get major shareholder trades (股东增减持)."""
         return self._get("/v1/market/holder-trade", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -307,7 +329,7 @@ class AShareHub:
 
     def concepts(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -315,7 +337,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get concept/theme sector indices (概念板块)."""
         return self._get("/v1/market/concepts", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -323,8 +345,8 @@ class AShareHub:
 
     def concept_members(
         self,
-        ts_code: Optional[str] = None,
-        con_code: Optional[str] = None,
+        symbol: Optional[str] = None,
+        con_symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -332,7 +354,8 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get constituent stocks of a concept/theme index."""
         return self._get("/v1/market/concept-members", {
-            "ts_code": ts_code, "con_code": con_code,
+            "ts_code": symbol,
+            "con_code": con_symbol,
             "start_date": start_date, "end_date": end_date,
             "limit": limit, "offset": offset,
         })
@@ -341,31 +364,31 @@ class AShareHub:
 
     def stock_list(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> pd.DataFrame:
         """Get A-share stock list with basic info."""
         return self._get("/v1/reference/stocks", {
-            "ts_code": ts_code, "limit": limit, "offset": offset,
+            "ts_code": symbol, "limit": limit, "offset": offset,
         })
 
     def industry_list(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> pd.DataFrame:
         """Get Shenwan industry classification."""
         return self._get("/v1/reference/industries", {
-            "ts_code": ts_code, "limit": limit, "offset": offset,
+            "ts_code": symbol, "limit": limit, "offset": offset,
         })
 
     # ── Adjustment Factor ─────────────────────────────────────────────────
 
     def adj_factor(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -373,7 +396,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get daily adjustment factor for forward/backward price restoration."""
         return self._get("/v1/market/adj-factor", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -381,7 +404,7 @@ class AShareHub:
 
     def technical_factors(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -389,7 +412,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get technical indicators (MACD, KDJ, RSI, BOLL, CCI) and adjusted prices."""
         return self._get("/v1/market/technical-factors", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -397,7 +420,7 @@ class AShareHub:
 
     def limit_list(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit_type: Optional[str] = None,
@@ -406,7 +429,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get daily limit-up/limit-down stocks (涨跌停)."""
         return self._get("/v1/market/limit-list", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit_type": limit_type,
             "limit": limit, "offset": offset,
         })
@@ -415,7 +438,7 @@ class AShareHub:
 
     def income(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 20,
@@ -423,7 +446,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get income statement data."""
         return self._get("/v1/financials/income", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -431,7 +454,7 @@ class AShareHub:
 
     def balance_sheet(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 20,
@@ -439,7 +462,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get balance sheet data."""
         return self._get("/v1/financials/balance-sheet", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -447,7 +470,7 @@ class AShareHub:
 
     def cash_flow(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 20,
@@ -455,7 +478,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get cash flow statement data."""
         return self._get("/v1/financials/cash-flow", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -463,7 +486,7 @@ class AShareHub:
 
     def forecast(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 50,
@@ -471,7 +494,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get earnings forecast (业绩预告) data."""
         return self._get("/v1/financials/forecast", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -479,7 +502,7 @@ class AShareHub:
 
     def express(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 50,
@@ -487,7 +510,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get earnings express (业绩快报) data."""
         return self._get("/v1/financials/express", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -495,7 +518,7 @@ class AShareHub:
 
     def dividend(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 50,
@@ -503,7 +526,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get dividend and bonus share distribution data."""
         return self._get("/v1/shareholders/dividend", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -511,7 +534,7 @@ class AShareHub:
 
     def index_weight(
         self,
-        index_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -519,7 +542,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get index constituent stock weights."""
         return self._get("/v1/indices/index-weight", {
-            "index_code": index_code, "start_date": start_date,
+            "index_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -527,7 +550,7 @@ class AShareHub:
 
     def technical_factors_pro(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -535,7 +558,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get professional technical factors (200+ indicators with bfq/qfq/hfq variants)."""
         return self._get("/v1/market/technical-factors-pro", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -543,7 +566,7 @@ class AShareHub:
 
     def analyst_reports(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -551,7 +574,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get sell-side analyst earnings forecasts and ratings."""
         return self._get("/v1/financials/analyst-reports", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -559,7 +582,7 @@ class AShareHub:
 
     def top_inst(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -567,7 +590,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get Dragon & Tiger list institutional seat detail."""
         return self._get("/v1/market/top-inst", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -575,7 +598,7 @@ class AShareHub:
 
     def southbound_holdings(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -583,7 +606,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get mainland investor holdings of HK stocks (southbound, 港股通持股)."""
         return self._get("/v1/flows/southbound-holdings", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -591,7 +614,7 @@ class AShareHub:
 
     def audit(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 50,
@@ -599,7 +622,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get annual audit opinions (审计意见)."""
         return self._get("/v1/financials/audit", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -607,7 +630,7 @@ class AShareHub:
 
     def main_business(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -615,7 +638,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get main business composition by segment (主营业务构成)."""
         return self._get("/v1/financials/main-business", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -623,7 +646,7 @@ class AShareHub:
 
     def disclosure_date(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         limit: int = 100,
@@ -631,7 +654,7 @@ class AShareHub:
     ) -> pd.DataFrame:
         """Get planned/actual financial disclosure dates."""
         return self._get("/v1/financials/disclosure-date", {
-            "ts_code": ts_code, "start_date": start_date,
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "limit": limit, "offset": offset,
         })
 
@@ -657,19 +680,19 @@ class AShareHub:
 
     def realtime(
         self,
-        ts_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> pd.DataFrame:
         """Get the real-time intraday quote snapshot (latest price per security).
 
-        ``ts_code`` may be a single code or a comma-separated basket of up to 200,
+        ``symbol`` may be a single code or a comma-separated basket of up to 200,
         e.g. ``"600519.SH,000001.SZ"``. Omit it to page through the whole market.
         Includes price, OHLC, previous close, pct_chg, cumulative volume/turnover
         and the source quote timestamp. Continuously refreshed during trading hours.
         """
         return self._get("/v1/market/realtime", {
-            "ts_code": ts_code, "limit": limit, "offset": offset,
+            "ts_code": symbol, "limit": limit, "offset": offset,
         })
 
     # ── News Flash ────────────────────────────────────────────────────────
