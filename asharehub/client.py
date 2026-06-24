@@ -19,8 +19,8 @@ class AShareHub:
         df = client.market_daily(symbol="000001.SZ", start_date="2024-01-01")
 
     The instrument-code param is ``symbol`` (suffixed, e.g. ``000001.SZ``).
-    With ``version="v2"`` every call hits the /v2 API (which speaks ``symbol``
-    and returns JSON numbers); ``version="v1"`` (default) hits the legacy /v1 API.
+    By default the client targets the **/v2** API; pass ``version="v1"`` for the
+    legacy API.
     """
 
     def __init__(
@@ -30,11 +30,15 @@ class AShareHub:
         timeout: float = 30.0,
         version: str = "v2",
     ):
-        """``version="v2"`` switches every call to the unified-symbol /v2 API:
-        bare codes (``000001``) are accepted, responses return a bare ``symbol``
-        plus ``exchange`` instead of ``ts_code``, and an invalid code raises 422.
-        Method signatures are unchanged — ``ts_code=``/``index_code=`` are
-        transparently sent as the v2 ``symbol`` param.
+        """``version`` selects the API surface (default ``"v2"``):
+
+        - ``"v2"`` — unified-symbol API: responses use ``symbol`` (the suffixed
+          code, e.g. ``000001.SZ``) and real JSON numbers. An unparseable code
+          returns HTTP 422.
+        - ``"v1"`` — legacy Tushare-style API: responses use ``ts_code`` and
+          DECIMAL strings.
+
+        Either way the method param is ``symbol``.
         """
         if version not in ("v1", "v2"):
             raise ValueError("version must be 'v1' or 'v2'")
