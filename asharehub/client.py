@@ -28,7 +28,7 @@ class AShareHub:
         api_key: str,
         base_url: str = DEFAULT_BASE_URL,
         timeout: float = 30.0,
-        version: str = "v1",
+        version: str = "v2",
     ):
         """``version="v2"`` switches every call to the unified-symbol /v2 API:
         bare codes (``000001``) are accepted, responses return a bare ``symbol``
