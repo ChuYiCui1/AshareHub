@@ -45,7 +45,7 @@ from asharehub import AShareHub
 client = AShareHub(api_key="ash_your_key_here")
 
 # Get daily market data — returns pd.DataFrame
-df = client.market_daily(symbol="000001.SZ", start_date="2024-01-01", end_date="2024-12-31")
+df = client.market_daily(symbol="000001.SZ", start_date="20240101", end_date="20241231")
 print(df[["trade_date", "open", "high", "low", "close", "vol"]])
 
 client.close()
@@ -60,8 +60,8 @@ All methods return `pd.DataFrame`. Empty results return an empty DataFrame (`df.
 ### Market Data
 
 ```python
-df = client.market_daily(symbol="000001.SZ", start_date="2024-01-01")
-df = client.fundamentals(symbol="000001.SZ", start_date="2024-01-01")
+df = client.market_daily(symbol="000001.SZ", start_date="20240101")
+df = client.fundamentals(symbol="000001.SZ", start_date="20240101")
 df = client.margin(symbol="000001.SZ", limit=100)
 df = client.block_trade(symbol="000001.SZ", limit=100)
 df = client.top_list(limit=100)
@@ -77,7 +77,7 @@ df = client.limit_list(limit_type="U", limit=100)
 ### Capital Flows
 
 ```python
-df = client.moneyflow_hsgt(start_date="2024-01-01", limit=100)
+df = client.moneyflow_hsgt(start_date="20240101", limit=100)
 df = client.moneyflow(symbol="000001.SZ", limit=100)
 df = client.northbound_holdings(symbol="000001.SZ", limit=100)
 ```
@@ -97,7 +97,7 @@ df = client.dividend(symbol="000001.SZ", limit=50)
 ### Indices
 
 ```python
-df = client.index_daily(symbol="000300.SH", start_date="2024-01-01")
+df = client.index_daily(symbol="000300.SH", start_date="20240101")
 df = client.index_weight(symbol="399300.SZ", limit=100)
 ```
 
@@ -113,7 +113,7 @@ df = client.fx_daily(symbol="USDCNH.FXCM", limit=100)
 ```python
 df = client.stock_list(limit=100)
 df = client.industry_list(limit=100)
-df = client.trade_calendar(exchange="SSE", start_date="2024-01-01")
+df = client.trade_calendar(exchange="SSE", start_date="20240101")
 ```
 
 ---
@@ -125,8 +125,8 @@ All data methods accept:
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `symbol` | str | Stock/index code, e.g. `000001.SZ` |
-| `start_date` | str | Start date, `YYYY-MM-DD` |
-| `end_date` | str | End date, `YYYY-MM-DD` |
+| `start_date` | str | Start date, `YYYYMMDD` |
+| `end_date` | str | End date, `YYYYMMDD` |
 | `limit` | int | Max rows per request |
 | `offset` | int | Pagination offset |
 

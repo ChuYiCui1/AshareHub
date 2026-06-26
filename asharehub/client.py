@@ -16,7 +16,7 @@ class AShareHub:
         from asharehub import AShareHub
 
         client = AShareHub(api_key="ash_...")
-        df = client.market_daily(symbol="000001.SZ", start_date="2024-01-01")
+        df = client.market_daily(symbol="000001.SZ", start_date="20240101")
 
     The instrument-code param is ``symbol`` (suffixed, e.g. ``000001.SZ``).
     By default the client targets the **/v2** API; pass ``version="v1"`` for the
@@ -714,7 +714,7 @@ class AShareHub:
 
         ``source`` is required — one feed per call: "cls" (财联社), "jin10" (金十),
         or "sina" (新浪). Content is Chinese (content_cn). Ordered newest first.
-        Optional: importance (>= filter), start_date/end_date (YYYY-MM-DD on publish_time).
+        Optional: importance (>= filter), start_date/end_date (YYYYMMDD on publish_time).
         """
         return self._get("/v1/news/flash", {
             "source": source, "start_date": start_date, "end_date": end_date,
