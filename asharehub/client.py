@@ -412,25 +412,21 @@ class AShareHub:
         list_status: Optional[str] = None,
         exchange: Optional[str] = None,
         is_hs: Optional[str] = None,
-        limit: int = 100,
-        offset: int = 0,
     ) -> pd.DataFrame:
-        """Get A-share stock list with basic info. Filters: name, market, list_status, exchange, is_hs."""
+        """Get A-share stock list with basic info. Filters: name, market, list_status,
+        exchange, is_hs. Returns the full directory (no limit/offset — not paginated)."""
         return self._get("/v1/reference/stocks", {
             "ts_code": symbol, "name": name, "market": market,
             "list_status": list_status, "exchange": exchange, "is_hs": is_hs,
-            "limit": limit, "offset": offset,
         })
 
     def industry_list(
         self,
         symbol: Optional[str] = None,
-        limit: int = 100,
-        offset: int = 0,
     ) -> pd.DataFrame:
-        """Get Shenwan industry classification."""
+        """Get Shenwan industry classification (full set — no limit/offset, not paginated)."""
         return self._get("/v1/reference/industries", {
-            "ts_code": symbol, "limit": limit, "offset": offset,
+            "ts_code": symbol,
         })
 
     # ── Adjustment Factor ─────────────────────────────────────────────────
