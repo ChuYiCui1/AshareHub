@@ -8,7 +8,7 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/asharehub.svg)](https://pypi.org/project/asharehub/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[Website](https://asharehub.com) • [Documentation](https://asharehub.com/docs) • [API Reference](https://asharehub.com/docs#api-reference) • [Get API Key](https://asharehub.com/console/register)
+[Website](https://asharehub.com) • [Documentation](https://asharehub.com/en/docs) • [API Reference](https://asharehub.com/en/docs/market-daily) • [MCP & Skill](https://asharehub.com/en/skill) • [Get API Key](https://asharehub.com/en/console/register)
 
 </div>
 
@@ -158,7 +158,7 @@ All data methods accept:
 
 Get your free API key:
 
-1. Visit [asharehub.com/console/register](https://asharehub.com/console/register)
+1. Visit [asharehub.com/en/console/register](https://asharehub.com/en/console/register)
 2. Create an account
 3. Generate your API key in the dashboard
 
@@ -221,7 +221,8 @@ client = AShareHub(
 
 ## Support
 
-- [Documentation](https://asharehub.com/docs)
+- [Documentation](https://asharehub.com/en/docs)
+- [MCP & Agent Skill](https://asharehub.com/en/skill)
 - [Report Issues](https://github.com/ChuYiCui1/AshareHub/issues)
 - Email: support@asharehub.com
 

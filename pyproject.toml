@@ -33,9 +33,12 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://asharehub.com"
-Documentation = "https://asharehub.com/docs"
+Documentation = "https://asharehub.com/en/docs"
+"API Reference" = "https://asharehub.com/en/docs/market-daily"
+"Get API Key" = "https://asharehub.com/en/console/register"
 Repository = "https://github.com/ChuYiCui1/AshareHub"
 "Bug Tracker" = "https://github.com/ChuYiCui1/AshareHub/issues"
+Changelog = "https://github.com/ChuYiCui1/AshareHub/releases"
 
 [project.optional-dependencies]
 dev = [
