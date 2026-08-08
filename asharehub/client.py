@@ -79,6 +79,11 @@ class AShareHub:
         "up_stat", "limit",
         "l1_code", "l1_name", "l2_code", "l2_name",
         "l3_code", "l3_name",
+        "nav_date", "setup_date", "base_date", "pub_date",
+        "csname", "extname", "cname", "index_name", "index_symbol",
+        "mgr_name", "custod_name", "etf_type", "etf_name",
+        "indx_name", "indx_csname", "pub_party_name", "adj_circle",
+        "sub_flag",
     }
 
     # v2 unifies instrument-code params under `symbol` / `con_symbol`.
@@ -193,6 +198,137 @@ class AShareHub:
         return self._get("/v1/indices/daily", {
             "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "trade_date": trade_date,
+        })
+
+    # ── ETF ──────────────────────────────────────────────────────────────
+
+    def etf_basic(
+        self,
+        symbol: Optional[str] = None,
+        index_symbol: Optional[str] = None,
+        list_status: Optional[str] = None,
+        exchange: Optional[str] = None,
+        manager: Optional[str] = None,
+        etf_type: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get the domestic ETF directory, including QDII ETFs."""
+        return self._get("/v1/etf/basic", {
+            "ts_code": symbol, "index_symbol": index_symbol,
+            "list_status": list_status, "exchange": exchange,
+            "manager": manager, "etf_type": etf_type,
+        })
+
+    def etf_indices(
+        self,
+        symbol: Optional[str] = None,
+        pub_date: Optional[str] = None,
+        base_date: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get benchmark indices tracked by domestic ETFs."""
+        return self._get("/v1/etf/indices", {
+            "ts_code": symbol, "pub_date": pub_date, "base_date": base_date,
+        })
+
+    def etf_daily(
+        self,
+        symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trade_date: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get ETF daily OHLC, volume and turnover."""
+        return self._get("/v1/etf/daily", {
+            "ts_code": symbol, "start_date": start_date,
+            "end_date": end_date, "trade_date": trade_date,
+        })
+
+    def etf_adj_factor(
+        self,
+        symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trade_date: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get ETF adjustment factors."""
+        return self._get("/v1/etf/adj-factor", {
+            "ts_code": symbol, "start_date": start_date,
+            "end_date": end_date, "trade_date": trade_date,
+        })
+
+    def etf_share_size(
+        self,
+        symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        exchange: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get daily ETF shares, assets, NAV and close."""
+        return self._get("/v1/etf/share-size", {
+            "ts_code": symbol, "start_date": start_date, "end_date": end_date,
+            "trade_date": trade_date, "exchange": exchange,
+        })
+
+    def etf_nav(
+        self,
+        symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        nav_date: Optional[str] = None,
+        ann_date: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get ETF unit, accumulated and adjusted NAV."""
+        return self._get("/v1/etf/nav", {
+            "ts_code": symbol, "start_date": start_date, "end_date": end_date,
+            "nav_date": nav_date, "ann_date": ann_date,
+        })
+
+    def etf_portfolio(
+        self,
+        symbol: Optional[str] = None,
+        con_symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        period: Optional[str] = None,
+        ann_date: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get an ETF's periodically disclosed security holdings."""
+        return self._get("/v1/etf/portfolio", {
+            "ts_code": symbol, "con_code": con_symbol,
+            "start_date": start_date, "end_date": end_date,
+            "period": period, "ann_date": ann_date,
+        })
+
+    def etf_sh_basket(
+        self,
+        symbol: Optional[str] = None,
+        con_symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        exchange: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get the Shanghai ETF creation/redemption PCF basket."""
+        return self._get("/v1/etf/basket/sh", {
+            "ts_code": symbol, "con_code": con_symbol,
+            "start_date": start_date, "end_date": end_date,
+            "trade_date": trade_date, "exchange": exchange,
+        })
+
+    def etf_sz_basket(
+        self,
+        symbol: Optional[str] = None,
+        con_symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        exchange: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get the Shenzhen ETF creation/redemption PCF basket."""
+        return self._get("/v1/etf/basket/sz", {
+            "ts_code": symbol, "con_code": con_symbol,
+            "start_date": start_date, "end_date": end_date,
+            "trade_date": trade_date, "exchange": exchange,
         })
 
     # ── Financials ────────────────────────────────────────────────────────

@@ -20,7 +20,7 @@ AShareHub provides institutional-grade Chinese A-Share market data through a sim
 
 **Key Features:**
 - Returns `pd.DataFrame` — same convention as Tushare
-- 38 data endpoints covering market, financial, real-time, news, and reference data
+- 47 data endpoints covering stocks, ETFs, financials, real-time, news, and reference data
 - 10+ years of historical data
 - Secure API key authentication
 - Fast and reliable
@@ -62,57 +62,69 @@ All methods return `pd.DataFrame`. Empty results return an empty DataFrame (`df.
 ```python
 df = client.market_daily(symbol="000001.SZ", start_date="20240101")
 df = client.fundamentals(symbol="000001.SZ", start_date="20240101")
-df = client.margin(symbol="000001.SZ", limit=100)
-df = client.block_trade(symbol="000001.SZ", limit=100)
-df = client.top_list(limit=100)
-df = client.shareholders(symbol="000001.SZ", limit=100)
-df = client.holder_trade(symbol="000001.SZ", limit=100)
-df = client.concepts(limit=100)
-df = client.concept_members(symbol="TS2", limit=100)
-df = client.adj_factor(symbol="000001.SZ", limit=100)
-df = client.technical_factors(symbol="000001.SZ", limit=100)
-df = client.limit_list(limit_type="U", limit=100)
+df = client.margin(symbol="000001.SZ")
+df = client.block_trade(symbol="000001.SZ")
+df = client.top_list()
+df = client.shareholders(symbol="000001.SZ")
+df = client.holder_trade(symbol="000001.SZ")
+df = client.concepts()
+df = client.concept_members(symbol="BK0425.DC")
+df = client.adj_factor(symbol="000001.SZ")
+df = client.technical_factors(symbol="000001.SZ")
+df = client.limit_list(limit_type="U")
 ```
 
 ### Capital Flows
 
 ```python
-df = client.moneyflow_hsgt(start_date="20240101", limit=100)
-df = client.moneyflow(symbol="000001.SZ", limit=100)
-df = client.northbound_holdings(symbol="000001.SZ", limit=100)
+df = client.moneyflow_hsgt(start_date="20240101")
+df = client.moneyflow(symbol="000001.SZ")
+df = client.northbound_holdings(symbol="000001.SZ")
 ```
 
 ### Financials
 
 ```python
-df = client.financial_indicators(symbol="000001.SZ", limit=20)
-df = client.income(symbol="000001.SZ", limit=20)
-df = client.balance_sheet(symbol="000001.SZ", limit=20)
-df = client.cash_flow(symbol="000001.SZ", limit=20)
-df = client.forecast(symbol="000001.SZ", limit=50)
-df = client.express(symbol="000001.SZ", limit=50)
-df = client.dividend(symbol="000001.SZ", limit=50)
+df = client.financial_indicators(symbol="000001.SZ")
+df = client.income(symbol="000001.SZ")
+df = client.balance_sheet(symbol="000001.SZ")
+df = client.cash_flow(symbol="000001.SZ")
+df = client.forecast(symbol="000001.SZ")
+df = client.express(symbol="000001.SZ")
+df = client.dividend(symbol="000001.SZ")
 ```
 
 ### Indices
 
 ```python
 df = client.index_daily(symbol="000300.SH", start_date="20240101")
-df = client.index_weight(symbol="399300.SZ", limit=100)
+df = client.index_weight(symbol="399300.SZ")
+```
+
+### ETFs
+
+```python
+df = client.etf_basic(list_status="L")
+df = client.etf_indices()
+df = client.etf_daily(symbol="510300.SH", start_date="20260101")
+df = client.etf_adj_factor(symbol="510300.SH", start_date="20260101")
+df = client.etf_share_size(symbol="510300.SH", start_date="20260101")
+df = client.etf_nav(symbol="510300.SH", start_date="20260101")
+df = client.etf_portfolio(symbol="510300.SH", period="20260331")
 ```
 
 ### Other
 
 ```python
-df = client.chip_distribution(symbol="000001.SZ", limit=100)
-df = client.fx_daily(symbol="USDCNH.FXCM", limit=100)
+df = client.chip_distribution(symbol="000001.SZ")
+df = client.fx_daily(symbol="USDCNH.FXCM")
 ```
 
 ### Reference Data
 
 ```python
-df = client.stock_list(limit=100)
-df = client.industry_list(limit=100)
+df = client.stock_list()
+df = client.industry_list()
 df = client.trade_calendar(exchange="SSE", start_date="20240101")
 ```
 
@@ -124,11 +136,9 @@ All data methods accept:
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `symbol` | str | Stock/index code, e.g. `000001.SZ` |
+| `symbol` | str | Suffixed stock/index/ETF code, e.g. `000001.SZ` |
 | `start_date` | str | Start date, `YYYYMMDD` |
 | `end_date` | str | End date, `YYYYMMDD` |
-| `limit` | int | Max rows per request |
-| `offset` | int | Pagination offset |
 
 ---
 
