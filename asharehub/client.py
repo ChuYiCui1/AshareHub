@@ -67,7 +67,7 @@ class AShareHub:
         "first_ann_date", "first_time", "last_time",
         "trade_time", "updated_at",
         "publish_time", "content_cn", "tags", "url", "source",
-        "symbol", "bk_code", "name", "area", "industry", "fullname", "enname",
+        "symbol", "name", "area", "industry", "fullname", "enname",
         "cnspell", "cn_spell", "market", "exchange", "curr_type", "list_status",
         "isin",
         "is_hs", "report_type", "comp_type", "update_flag",
@@ -507,43 +507,37 @@ class AShareHub:
 
     def concepts(
         self,
-        bk_code: Optional[str] = None,
+        symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         trade_date: Optional[str] = None,
         name: Optional[str] = None,
         idx_type: Optional[str] = None,
     ) -> pd.DataFrame:
-        """Get concept/theme sectors. ``bk_code`` is an Eastmoney BKxxxx.DC code."""
-        params = {
-            "ts_code": bk_code, "start_date": start_date,
+        """Get concept/theme sector indices (概念板块). Filters: trade_date, name, idx_type."""
+        return self._get("/v1/market/concepts", {
+            "ts_code": symbol, "start_date": start_date,
             "end_date": end_date, "trade_date": trade_date,
             "name": name, "idx_type": idx_type,
-        }
-        if self._version == "v2":
-            params["bk_code"] = params.pop("ts_code")
-        return self._get("/v1/market/concepts", params)
+        })
 
-    # ── Concept Constituents ───────────────────────────────────────────────
+    # ── Concept Members ────────────────────────────────────────────────────
 
     def concept_members(
         self,
-        bk_code: Optional[str] = None,
-        con_code: Optional[str] = None,
+        symbol: Optional[str] = None,
+        con_symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         trade_date: Optional[str] = None,
     ) -> pd.DataFrame:
-        """Get concept constituents while preserving the source ``con_code`` name."""
-        params = {
-            "ts_code": bk_code,
-            "con_code": con_code,
+        """Get constituent stocks of a concept/theme index. Filter: trade_date."""
+        return self._get("/v1/market/concept-members", {
+            "ts_code": symbol,
+            "con_code": con_symbol,
             "start_date": start_date, "end_date": end_date,
             "trade_date": trade_date,
-        }
-        if self._version == "v2":
-            params["bk_code"] = params.pop("ts_code")
-        return self._get("/v1/market/concept-members", params)
+        })
 
     # ── Reference ──────────────────────────────────────────────────────────
 

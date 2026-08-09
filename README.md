@@ -68,7 +68,7 @@ df = client.top_list()
 df = client.shareholders(symbol="000001.SZ")
 df = client.holder_trade(symbol="000001.SZ")
 df = client.concepts()
-df = client.concept_members(bk_code="BK0425.DC", con_code="000001.SZ")
+df = client.concept_members(symbol="BK0425.DC", con_symbol="000001.SZ")
 df = client.adj_factor(symbol="000001.SZ")
 df = client.technical_factors(symbol="000001.SZ")
 df = client.limit_list(limit_type="U")
@@ -150,9 +150,6 @@ All data methods accept:
 | `symbol` | str | Suffixed stock/index/ETF/HK code, e.g. `000001.SZ` or `00700.HK` |
 | `start_date` | str | Start date, `YYYYMMDD` |
 | `end_date` | str | End date, `YYYYMMDD` |
-
-Eastmoney sector codes such as `BK0425.DC` use `bk_code`. In
-`concept_members()`, the constituent stock field keeps the name `con_code`.
 
 ---
 

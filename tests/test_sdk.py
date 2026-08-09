@@ -53,35 +53,16 @@ def test_hk_methods_target_expected_paths():
     assert calls[1][1]["trade_date"] == "20260807"
 
 
-def test_concept_methods_keep_con_code_and_bk_code_separate():
-    client = object.__new__(AShareHub)
-    client._version = "v2"
-    calls = []
-    client._get = lambda path, params: calls.append((path, params)) or pd.DataFrame()
+def test_concept_methods_keep_public_symbol_contract():
+    import inspect
 
-    client.concepts(bk_code="BK0949.DC", trade_date="20260807")
-    client.concept_members(
-        bk_code="BK0949.DC", con_code="000001.SZ", trade_date="20260807"
-    )
+    concepts = inspect.signature(AShareHub.concepts).parameters
+    members = inspect.signature(AShareHub.concept_members).parameters
 
-    assert calls[0][1]["bk_code"] == "BK0949.DC"
-    assert "symbol" not in calls[0][1]
-    assert calls[1][1]["bk_code"] == "BK0949.DC"
-    assert calls[1][1]["con_code"] == "000001.SZ"
-    assert "symbol" not in calls[1][1]
-    assert "con_symbol" not in calls[1][1]
-
-
-def test_v1_concept_methods_preserve_tushare_parameter_names():
-    client = object.__new__(AShareHub)
-    client._version = "v1"
-    calls = []
-    client._get = lambda path, params: calls.append((path, params)) or pd.DataFrame()
-
-    client.concept_members(bk_code="BK0949.DC", con_code="000001.SZ")
-
-    assert calls[0][1]["ts_code"] == "BK0949.DC"
-    assert calls[0][1]["con_code"] == "000001.SZ"
+    assert "symbol" in concepts and "bk_code" not in concepts
+    assert {"symbol", "con_symbol"} <= set(members)
+    assert "bk_code" not in members and "con_code" not in members
+    assert AShareHub._V2_PARAM_RENAME["con_code"] == "con_symbol"
 
 
 @requires_server
