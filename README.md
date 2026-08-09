@@ -20,7 +20,7 @@ AShareHub provides Chinese A-share, ETF and Hong Kong market data through a simp
 
 **Key Features:**
 - Returns `pd.DataFrame` — same convention as Tushare
-- 50+ data endpoints covering A-shares, ETFs, Hong Kong stocks, financials, real-time, news, and reference data
+- 50 data endpoints covering A-shares, ETFs, Hong Kong stocks, financials, real-time, news, and reference data
 - 10+ years of historical data
 - Secure API key authentication
 - Fast and reliable
@@ -56,6 +56,15 @@ client.close()
 ## API Methods
 
 All methods return `pd.DataFrame`. Empty results return an empty DataFrame (`df.empty == True`).
+The packaged `PUBLIC_CONTRACT` contains every REST path, SDK/MCP signature,
+request parameter and response field:
+
+```python
+from asharehub import get_contract
+
+daily_contract = get_contract("market_daily")
+print(daily_contract["response_fields"])
+```
 
 ### Market Data
 
@@ -143,7 +152,9 @@ df = client.trade_calendar(exchange="SSE", start_date="20240101")
 
 ## Common Parameters
 
-All data methods accept:
+Most instrument/date-series methods accept some or all of the following. Use
+`get_contract(method)` for the exact signature; market-wide, reference, news and
+calendar interfaces intentionally differ.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|

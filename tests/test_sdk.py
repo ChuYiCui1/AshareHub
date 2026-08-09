@@ -11,9 +11,11 @@ on DataFrame shape and columns (df.iloc[0]["col"]), not on model-instance
 attributes.
 """
 import os
+import inspect
 import pytest
 import pandas as pd
-from asharehub import AShareHub, __version__
+from asharehub import AShareHub, PUBLIC_CONTRACT, get_contract, __version__
+from asharehub.models import MODEL_BY_METHOD
 
 API_KEY = os.getenv("ASHAREHUB_API_KEY", "")
 BASE_URL = os.getenv("ASHAREHUB_BASE_URL", "http://localhost:8000")
@@ -54,8 +56,6 @@ def test_hk_methods_target_expected_paths():
 
 
 def test_concept_methods_keep_public_symbol_contract():
-    import inspect
-
     concepts = inspect.signature(AShareHub.concepts).parameters
     members = inspect.signature(AShareHub.concept_members).parameters
 
@@ -63,6 +63,24 @@ def test_concept_methods_keep_public_symbol_contract():
     assert {"symbol", "con_symbol"} <= set(members)
     assert "bk_code" not in members and "con_code" not in members
     assert AShareHub._V2_PARAM_RENAME["con_code"] == "con_symbol"
+
+
+def test_machine_readable_contract_matches_sdk_methods_and_models():
+    interfaces = PUBLIC_CONTRACT["interfaces"]
+    assert PUBLIC_CONTRACT["version"] == "v2"
+    assert len(interfaces) == 50
+    assert set(MODEL_BY_METHOD) == set(interfaces)
+
+    for method, entry in interfaces.items():
+        signature = inspect.signature(getattr(AShareHub, method)).parameters
+        assert [name for name in signature if name != "self"] == entry["request_parameters"]
+        assert list(MODEL_BY_METHOD[method].model_fields) == entry["response_fields"]
+        assert not {"ts_code", "index_code", "con_code"} & set(entry["response_fields"])
+
+    assert get_contract("concept_members")["response_fields"][:3] == [
+        "trade_date", "symbol", "con_symbol",
+    ]
+    assert get_contract("etf_basic")["response_fields"][4] == "index_symbol"
 
 
 @requires_server
