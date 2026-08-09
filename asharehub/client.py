@@ -67,8 +67,9 @@ class AShareHub:
         "first_ann_date", "first_time", "last_time",
         "trade_time", "updated_at",
         "publish_time", "content_cn", "tags", "url", "source",
-        "symbol", "name", "area", "industry", "fullname", "enname",
-        "cnspell", "market", "exchange", "curr_type", "list_status",
+        "symbol", "bk_code", "name", "area", "industry", "fullname", "enname",
+        "cnspell", "cn_spell", "market", "exchange", "curr_type", "list_status",
+        "isin",
         "is_hs", "report_type", "comp_type", "update_flag",
         "holder_name", "holder_type", "in_de",
         "buyer", "seller", "div_proc", "type",
@@ -331,6 +332,54 @@ class AShareHub:
             "trade_date": trade_date, "exchange": exchange,
         })
 
+    # ── Hong Kong Equities ───────────────────────────────────────────────
+
+    def hk_stock_list(
+        self,
+        symbol: Optional[str] = None,
+        list_status: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get the Hong Kong stock directory.
+
+        Symbols use Tushare's five-digit suffixed form, e.g. ``00700.HK``.
+        """
+        return self._get("/v1/hk/basic", {
+            "ts_code": symbol,
+            "list_status": list_status,
+        })
+
+    def hk_daily(
+        self,
+        symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trade_date: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Get unadjusted Hong Kong daily OHLCV bars.
+
+        Prices and turnover are in HKD; volume is in shares.  This endpoint does
+        not currently expose Hong Kong adjustment factors.
+        """
+        return self._get("/v1/hk/daily", {
+            "ts_code": symbol,
+            "start_date": start_date,
+            "end_date": end_date,
+            "trade_date": trade_date,
+        })
+
+    def hk_trade_calendar(
+        self,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        is_open: Optional[int] = None,
+    ) -> pd.DataFrame:
+        """Get the Hong Kong Exchange trading calendar."""
+        return self._get("/v1/hk/trade-calendar", {
+            "start_date": start_date,
+            "end_date": end_date,
+            "is_open": is_open,
+        })
+
     # ── Financials ────────────────────────────────────────────────────────
 
     def financial_indicators(
@@ -458,37 +507,43 @@ class AShareHub:
 
     def concepts(
         self,
-        symbol: Optional[str] = None,
+        bk_code: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         trade_date: Optional[str] = None,
         name: Optional[str] = None,
         idx_type: Optional[str] = None,
     ) -> pd.DataFrame:
-        """Get concept/theme sector indices (概念板块). Filters: trade_date, name, idx_type."""
-        return self._get("/v1/market/concepts", {
-            "ts_code": symbol, "start_date": start_date,
+        """Get concept/theme sectors. ``bk_code`` is an Eastmoney BKxxxx.DC code."""
+        params = {
+            "ts_code": bk_code, "start_date": start_date,
             "end_date": end_date, "trade_date": trade_date,
             "name": name, "idx_type": idx_type,
-        })
+        }
+        if self._version == "v2":
+            params["bk_code"] = params.pop("ts_code")
+        return self._get("/v1/market/concepts", params)
 
-    # ── Concept Members ────────────────────────────────────────────────────
+    # ── Concept Constituents ───────────────────────────────────────────────
 
     def concept_members(
         self,
-        symbol: Optional[str] = None,
-        con_symbol: Optional[str] = None,
+        bk_code: Optional[str] = None,
+        con_code: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         trade_date: Optional[str] = None,
     ) -> pd.DataFrame:
-        """Get constituent stocks of a concept/theme index. Filter: trade_date."""
-        return self._get("/v1/market/concept-members", {
-            "ts_code": symbol,
-            "con_code": con_symbol,
+        """Get concept constituents while preserving the source ``con_code`` name."""
+        params = {
+            "ts_code": bk_code,
+            "con_code": con_code,
             "start_date": start_date, "end_date": end_date,
             "trade_date": trade_date,
-        })
+        }
+        if self._version == "v2":
+            params["bk_code"] = params.pop("ts_code")
+        return self._get("/v1/market/concept-members", params)
 
     # ── Reference ──────────────────────────────────────────────────────────
 

@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "asharehub"
-version = "0.8.0"
-description = "Python SDK for AShareHub — Chinese A-share and ETF market data API (40+ endpoints)"
+version = "0.9.0"
+description = "Python SDK for AShareHub — Chinese A-share, ETF and Hong Kong market data API"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
     {name = "AShareHub", email = "support@asharehub.com"}
 ]
-keywords = ["asharehub", "china", "a-share", "stock", "market", "data", "api", "finance"]
+keywords = ["asharehub", "china", "a-share", "hong-kong", "hk-stock", "stock", "market", "data", "api", "finance"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",

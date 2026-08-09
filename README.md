@@ -2,7 +2,7 @@
 
 # AShareHub Python SDK
 
-**Official Python SDK for Chinese A-Share Market Data**
+**Official Python SDK for Chinese A-Share, ETF and Hong Kong Market Data**
 
 [![PyPI version](https://img.shields.io/pypi/v/asharehub.svg)](https://pypi.org/project/asharehub/)
 [![Python versions](https://img.shields.io/pypi/pyversions/asharehub.svg)](https://pypi.org/project/asharehub/)
@@ -16,11 +16,11 @@
 
 ## Overview
 
-AShareHub provides institutional-grade Chinese A-Share market data through a simple, modern Python SDK. Access real-time and historical data for all listed Chinese A-shares.
+AShareHub provides Chinese A-share, ETF and Hong Kong market data through a simple, modern Python SDK.
 
 **Key Features:**
 - Returns `pd.DataFrame` — same convention as Tushare
-- 47 data endpoints covering stocks, ETFs, financials, real-time, news, and reference data
+- 50+ data endpoints covering A-shares, ETFs, Hong Kong stocks, financials, real-time, news, and reference data
 - 10+ years of historical data
 - Secure API key authentication
 - Fast and reliable
@@ -68,7 +68,7 @@ df = client.top_list()
 df = client.shareholders(symbol="000001.SZ")
 df = client.holder_trade(symbol="000001.SZ")
 df = client.concepts()
-df = client.concept_members(symbol="BK0425.DC")
+df = client.concept_members(bk_code="BK0425.DC", con_code="000001.SZ")
 df = client.adj_factor(symbol="000001.SZ")
 df = client.technical_factors(symbol="000001.SZ")
 df = client.limit_list(limit_type="U")
@@ -113,6 +113,17 @@ df = client.etf_nav(symbol="510300.SH", start_date="20260101")
 df = client.etf_portfolio(symbol="510300.SH", period="20260331")
 ```
 
+### Hong Kong Stocks
+
+```python
+# Five-digit symbols with the .HK suffix
+stocks = client.hk_stock_list(list_status="L")
+daily = client.hk_daily(symbol="00700.HK", start_date="20260101")
+calendar = client.hk_trade_calendar(start_date="20260101", is_open=1)
+```
+
+Hong Kong daily prices are unadjusted. Prices and turnover are in HKD; volume is in shares.
+
 ### Other
 
 ```python
@@ -136,9 +147,12 @@ All data methods accept:
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `symbol` | str | Suffixed stock/index/ETF code, e.g. `000001.SZ` |
+| `symbol` | str | Suffixed stock/index/ETF/HK code, e.g. `000001.SZ` or `00700.HK` |
 | `start_date` | str | Start date, `YYYYMMDD` |
 | `end_date` | str | End date, `YYYYMMDD` |
+
+Eastmoney sector codes such as `BK0425.DC` use `bk_code`. In
+`concept_members()`, the constituent stock field keeps the name `con_code`.
 
 ---
 

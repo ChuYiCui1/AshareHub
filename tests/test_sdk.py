@@ -32,7 +32,56 @@ def client():
 
 
 def test_sdk_version():
-    assert __version__ == "0.8.0"
+    assert __version__ == "0.9.0"
+
+
+def test_hk_methods_target_expected_paths():
+    client = object.__new__(AShareHub)
+    calls = []
+    client._get = lambda path, params: calls.append((path, params)) or pd.DataFrame()
+
+    client.hk_stock_list(symbol="00700.HK", list_status="L")
+    client.hk_daily(symbol="00700.HK", trade_date="20260807")
+    client.hk_trade_calendar(start_date="20260801", end_date="20260808", is_open=1)
+
+    assert [path for path, _ in calls] == [
+        "/v1/hk/basic",
+        "/v1/hk/daily",
+        "/v1/hk/trade-calendar",
+    ]
+    assert calls[0][1] == {"ts_code": "00700.HK", "list_status": "L"}
+    assert calls[1][1]["trade_date"] == "20260807"
+
+
+def test_concept_methods_keep_con_code_and_bk_code_separate():
+    client = object.__new__(AShareHub)
+    client._version = "v2"
+    calls = []
+    client._get = lambda path, params: calls.append((path, params)) or pd.DataFrame()
+
+    client.concepts(bk_code="BK0949.DC", trade_date="20260807")
+    client.concept_members(
+        bk_code="BK0949.DC", con_code="000001.SZ", trade_date="20260807"
+    )
+
+    assert calls[0][1]["bk_code"] == "BK0949.DC"
+    assert "symbol" not in calls[0][1]
+    assert calls[1][1]["bk_code"] == "BK0949.DC"
+    assert calls[1][1]["con_code"] == "000001.SZ"
+    assert "symbol" not in calls[1][1]
+    assert "con_symbol" not in calls[1][1]
+
+
+def test_v1_concept_methods_preserve_tushare_parameter_names():
+    client = object.__new__(AShareHub)
+    client._version = "v1"
+    calls = []
+    client._get = lambda path, params: calls.append((path, params)) or pd.DataFrame()
+
+    client.concept_members(bk_code="BK0949.DC", con_code="000001.SZ")
+
+    assert calls[0][1]["ts_code"] == "BK0949.DC"
+    assert calls[0][1]["con_code"] == "000001.SZ"
 
 
 @requires_server
@@ -99,4 +148,12 @@ def test_etf_daily(client):
     df = client.etf_daily(symbol="510300.SH")
     assert len(df) > 0
     assert df.iloc[0]["symbol"] == "510300.SH"
+    assert "close" in df.columns
+
+
+@requires_server
+def test_hk_daily(client):
+    df = client.hk_daily(symbol="00700.HK")
+    assert len(df) > 0
+    assert df.iloc[0]["symbol"] == "00700.HK"
     assert "close" in df.columns
