@@ -37,22 +37,9 @@ def test_sdk_version():
     assert __version__ == "0.9.0"
 
 
-def test_hk_methods_target_expected_paths():
-    client = object.__new__(AShareHub)
-    calls = []
-    client._get = lambda path, params: calls.append((path, params)) or pd.DataFrame()
-
-    client.hk_stock_list(symbol="00700.HK", list_status="L")
-    client.hk_daily(symbol="00700.HK", trade_date="20260807")
-    client.hk_trade_calendar(start_date="20260801", end_date="20260808", is_open=1)
-
-    assert [path for path, _ in calls] == [
-        "/v1/hk/basic",
-        "/v1/hk/daily",
-        "/v1/hk/trade-calendar",
-    ]
-    assert calls[0][1] == {"ts_code": "00700.HK", "list_status": "L"}
-    assert calls[1][1]["trade_date"] == "20260807"
+def test_unreleased_hk_market_methods_are_not_public():
+    for method in ("hk_stock_list", "hk_daily", "hk_trade_calendar"):
+        assert not hasattr(AShareHub, method)
 
 
 def test_concept_methods_keep_public_symbol_contract():
@@ -68,7 +55,7 @@ def test_concept_methods_keep_public_symbol_contract():
 def test_machine_readable_contract_matches_sdk_methods_and_models():
     interfaces = PUBLIC_CONTRACT["interfaces"]
     assert PUBLIC_CONTRACT["version"] == "v2"
-    assert len(interfaces) == 50
+    assert len(interfaces) == 47
     assert set(MODEL_BY_METHOD) == set(interfaces)
 
     for method, entry in interfaces.items():
@@ -147,12 +134,4 @@ def test_etf_daily(client):
     df = client.etf_daily(symbol="510300.SH")
     assert len(df) > 0
     assert df.iloc[0]["symbol"] == "510300.SH"
-    assert "close" in df.columns
-
-
-@requires_server
-def test_hk_daily(client):
-    df = client.hk_daily(symbol="00700.HK")
-    assert len(df) > 0
-    assert df.iloc[0]["symbol"] == "00700.HK"
     assert "close" in df.columns

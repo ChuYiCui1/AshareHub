@@ -2,7 +2,7 @@
 
 # AShareHub Python SDK
 
-**Official Python SDK for Chinese A-Share, ETF and Hong Kong Market Data**
+**Official Python SDK for Chinese A-Share and ETF Market Data**
 
 [![PyPI version](https://img.shields.io/pypi/v/asharehub.svg)](https://pypi.org/project/asharehub/)
 [![Python versions](https://img.shields.io/pypi/pyversions/asharehub.svg)](https://pypi.org/project/asharehub/)
@@ -16,11 +16,11 @@
 
 ## Overview
 
-AShareHub provides Chinese A-share, ETF and Hong Kong market data through a simple, modern Python SDK.
+AShareHub provides Chinese A-share and ETF market data through a simple, modern Python SDK.
 
 **Key Features:**
 - Returns `pd.DataFrame` — same convention as Tushare
-- 50 data endpoints covering A-shares, ETFs, Hong Kong stocks, financials, real-time, news, and reference data
+- 47 data endpoints covering A-shares, ETFs, financials, real-time, news, and reference data
 - 10+ years of historical data
 - Secure API key authentication
 - Fast and reliable
@@ -122,17 +122,6 @@ df = client.etf_nav(symbol="510300.SH", start_date="20260101")
 df = client.etf_portfolio(symbol="510300.SH", period="20260331")
 ```
 
-### Hong Kong Stocks
-
-```python
-# Five-digit symbols with the .HK suffix
-stocks = client.hk_stock_list(list_status="L")
-daily = client.hk_daily(symbol="00700.HK", start_date="20260101")
-calendar = client.hk_trade_calendar(start_date="20260101", is_open=1)
-```
-
-Hong Kong daily prices are unadjusted. Prices and turnover are in HKD; volume is in shares.
-
 ### Other
 
 ```python
@@ -158,7 +147,7 @@ calendar interfaces intentionally differ.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `symbol` | str | Suffixed stock/index/ETF/HK code, e.g. `000001.SZ` or `00700.HK` |
+| `symbol` | str | Suffixed stock/index/ETF code, e.g. `000001.SZ` |
 | `start_date` | str | Start date, `YYYYMMDD` |
 | `end_date` | str | End date, `YYYYMMDD` |
 

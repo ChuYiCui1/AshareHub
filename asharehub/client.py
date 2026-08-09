@@ -68,8 +68,7 @@ class AShareHub:
         "trade_time", "updated_at",
         "publish_time", "content_cn", "tags", "url", "source",
         "symbol", "name", "area", "industry", "fullname", "enname",
-        "cnspell", "cn_spell", "market", "exchange", "curr_type", "list_status",
-        "isin",
+        "cnspell", "market", "exchange", "curr_type", "list_status",
         "is_hs", "report_type", "comp_type", "update_flag",
         "holder_name", "holder_type", "in_de",
         "buyer", "seller", "div_proc", "type",
@@ -330,54 +329,6 @@ class AShareHub:
             "ts_code": symbol, "con_code": con_symbol,
             "start_date": start_date, "end_date": end_date,
             "trade_date": trade_date, "exchange": exchange,
-        })
-
-    # ── Hong Kong Equities ───────────────────────────────────────────────
-
-    def hk_stock_list(
-        self,
-        symbol: Optional[str] = None,
-        list_status: Optional[str] = None,
-    ) -> pd.DataFrame:
-        """Get the Hong Kong stock directory.
-
-        Symbols use Tushare's five-digit suffixed form, e.g. ``00700.HK``.
-        """
-        return self._get("/v1/hk/basic", {
-            "ts_code": symbol,
-            "list_status": list_status,
-        })
-
-    def hk_daily(
-        self,
-        symbol: Optional[str] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        trade_date: Optional[str] = None,
-    ) -> pd.DataFrame:
-        """Get unadjusted Hong Kong daily OHLCV bars.
-
-        Prices and turnover are in HKD; volume is in shares.  This endpoint does
-        not currently expose Hong Kong adjustment factors.
-        """
-        return self._get("/v1/hk/daily", {
-            "ts_code": symbol,
-            "start_date": start_date,
-            "end_date": end_date,
-            "trade_date": trade_date,
-        })
-
-    def hk_trade_calendar(
-        self,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        is_open: Optional[int] = None,
-    ) -> pd.DataFrame:
-        """Get the Hong Kong Exchange trading calendar."""
-        return self._get("/v1/hk/trade-calendar", {
-            "start_date": start_date,
-            "end_date": end_date,
-            "is_open": is_open,
         })
 
     # ── Financials ────────────────────────────────────────────────────────

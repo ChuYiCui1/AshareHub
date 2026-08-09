@@ -341,66 +341,6 @@
         "exchange"
       ]
     },
-    "hk_stock_list": {
-      "rest_path": "/v2/hk/basic",
-      "mcp_tool": "get_hk_stock_list",
-      "request_parameters": [
-        "symbol",
-        "list_status"
-      ],
-      "response_fields": [
-        "symbol",
-        "name",
-        "fullname",
-        "enname",
-        "cn_spell",
-        "market",
-        "list_status",
-        "list_date",
-        "delist_date",
-        "trade_unit",
-        "isin",
-        "curr_type"
-      ]
-    },
-    "hk_daily": {
-      "rest_path": "/v2/hk/daily",
-      "mcp_tool": "get_hk_daily",
-      "request_parameters": [
-        "symbol",
-        "start_date",
-        "end_date",
-        "trade_date"
-      ],
-      "response_fields": [
-        "symbol",
-        "trade_date",
-        "open",
-        "high",
-        "low",
-        "close",
-        "pre_close",
-        "change",
-        "pct_chg",
-        "vol",
-        "amount"
-      ]
-    },
-    "hk_trade_calendar": {
-      "rest_path": "/v2/hk/trade-calendar",
-      "mcp_tool": "get_hk_trade_calendar",
-      "request_parameters": [
-        "start_date",
-        "end_date",
-        "is_open"
-      ],
-      "response_fields": [
-        "exchange",
-        "cal_date",
-        "is_open",
-        "pretrade_date"
-      ]
-    },
     "financial_indicators": {
       "rest_path": "/v2/financials/indicators",
       "mcp_tool": "get_financial_indicators",
@@ -1430,10 +1370,10 @@
         "high",
         "low",
         "pre_close",
-        "pct_chg",
         "volume",
         "amount",
-        "trade_time"
+        "trade_time",
+        "pct_chg"
       ]
     },
     "news_flash": {
