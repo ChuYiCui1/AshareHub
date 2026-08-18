@@ -2,256 +2,303 @@
 
 # AShareHub Python SDK
 
-**Official Python SDK for Chinese A-Share and ETF Market Data**
+**Simple, Pythonic access to Chinese market data**
+
+Query A-shares, ETFs, indices, financial statements, capital flows, real-time
+quotes, news, and reference data from Python. Every endpoint returns a familiar
+`pandas.DataFrame`.
 
 [![PyPI version](https://img.shields.io/pypi/v/asharehub.svg)](https://pypi.org/project/asharehub/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/asharehub.svg)](https://pypi.org/project/asharehub/)
 [![Python versions](https://img.shields.io/pypi/pyversions/asharehub.svg)](https://pypi.org/project/asharehub/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Website](https://asharehub.com) • [Documentation](https://asharehub.com/en/docs) • [API Reference](https://asharehub.com/en/docs/market-daily) • [MCP & Skill](https://asharehub.com/en/skill) • [Get API Key](https://asharehub.com/en/console/register)
+[Website](https://asharehub.com) · [Documentation](https://asharehub.com/en/docs) · [API Reference](https://asharehub.com/en/docs/market-daily) · [Get an API Key](https://asharehub.com/en/console/register) · [Report an Issue](https://github.com/ChuYiCui1/AshareHub/issues)
 
 </div>
 
 ---
 
-## Overview
+AShareHub is the official open-source Python client for the hosted AShareHub
+market data API. It gives analysts, researchers, and developers one consistent
+interface for working with Chinese market data without maintaining their own
+collection and normalization pipeline.
 
-AShareHub provides Chinese A-share and ETF market data through a simple, modern Python SDK.
+## Contents
 
-### Documentation by use case
+- [Why AShareHub](#why-asharehub)
+- [Quick start](#quick-start)
+- [Data coverage](#data-coverage)
+- [Common workflows](#common-workflows)
+- [Data conventions](#data-conventions)
+- [Client configuration](#client-configuration)
+- [Error handling](#error-handling)
+- [Documentation and ecosystem](#documentation-and-ecosystem)
+- [Development](#development)
+- [Contributing](#contributing)
 
-- [China stock data Python SDK](https://asharehub.com/en/docs/sdk-install) — installation and first authenticated request
-- [Hosted China market data API](https://asharehub.com/en/docs) — REST API coverage and endpoint reference
-- [China stock MCP server](https://asharehub.com/en/docs/mcp-setup) — connect AI agents and MCP-compatible clients
-- [A-share market data API](https://asharehub.com/en/docs/market-daily) — daily prices, volume and trading data
-- [China ETF data API](https://asharehub.com/en/docs/etf-basic) — ETF reference data, prices, NAV, shares and portfolios
-- [China financial data API](https://asharehub.com/en/docs/financials) — statements, indicators, forecasts and dividends
-- [China stock API pricing](https://asharehub.com/en/console/pricing), [authentication](https://asharehub.com/en/docs#authentication) and [rate limits](https://asharehub.com/en/docs#rate-limits)
+## Why AShareHub
 
-**Key Features:**
-- Returns `pd.DataFrame` — same convention as Tushare
-- 47 data endpoints covering A-shares, ETFs, financials, real-time, news, and reference data
-- 10+ years of historical data
-- Secure API key authentication
-- Fast and reliable
+- **DataFrame first** — every public method returns a `pandas.DataFrame`, and
+  an empty result returns an empty DataFrame.
+- **One code convention** — stocks, indices, sectors, ETFs, and other
+  instruments use the public `symbol` field consistently.
+- **Broad market coverage** — use one client for prices, fundamentals,
+  financial statements, flows, holdings, ETFs, real-time quotes, and news.
+- **Discoverable contracts** — inspect request parameters and response fields
+  locally through the packaged machine-readable public contract.
+- **Small, familiar API** — install from PyPI, authenticate with one API key,
+  and receive analysis-ready tabular results.
 
----
+## Quick start
 
-## Installation
+### 1. Install
 
 ```bash
 pip install asharehub
 ```
 
-**Requirements:** Python 3.10+, pandas
+AShareHub requires Python 3.10 or newer.
 
----
+### 2. Get an API key
 
-## Quick Start
+Create an account in the [AShareHub console](https://asharehub.com/en/console/register)
+and generate an API key. Keep the key outside source control, for example in an
+environment variable:
 
-```python
-from asharehub import AShareHub
-
-client = AShareHub(api_key="ash_your_key_here")
-
-# Get daily market data — returns pd.DataFrame
-df = client.market_daily(symbol="000001.SZ", start_date="20240101", end_date="20241231")
-print(df[["trade_date", "open", "high", "low", "close", "vol"]])
-
-client.close()
+```bash
+export ASHAREHUB_API_KEY="ash_your_key_here"
 ```
 
----
-
-## API Methods
-
-All methods return `pd.DataFrame`. Empty results return an empty DataFrame (`df.empty == True`).
-The packaged `PUBLIC_CONTRACT` contains every REST path, SDK/MCP signature,
-request parameter and response field:
+### 3. Query market data
 
 ```python
-from asharehub import get_contract
+import os
+
+from asharehub import AShareHub
+
+with AShareHub(api_key=os.environ["ASHAREHUB_API_KEY"]) as client:
+    daily = client.market_daily(
+        symbol="000001.SZ",
+        start_date="20240101",
+        end_date="20241231",
+    )
+
+print(daily[["trade_date", "open", "high", "low", "close", "vol"]].head())
+```
+
+`daily` is a regular DataFrame, so it works directly with pandas, notebooks,
+visualization libraries, and research pipelines.
+
+## Data coverage
+
+| Area | Examples | Selected SDK methods |
+|---|---|---|
+| Market and valuation | Daily OHLC, valuation ratios, adjustment factors, technical factors, price limits | `market_daily`, `fundamentals`, `adj_factor`, `technical_factors`, `limit_list` |
+| Capital flows and holdings | Stock Connect flows, individual-stock money flow, northbound and southbound holdings | `moneyflow_hsgt`, `moneyflow`, `northbound_holdings`, `southbound_holdings` |
+| Financials and corporate data | Statements, indicators, forecasts, dividends, audits, main business | `income`, `balance_sheet`, `cash_flow`, `financial_indicators`, `forecast`, `dividend` |
+| Indices and concepts | Index prices and weights, concept sectors and constituents | `index_daily`, `index_weight`, `concepts`, `concept_members` |
+| ETFs | Directory, prices, adjustment factors, NAV, shares, portfolios, baskets | `etf_basic`, `etf_daily`, `etf_nav`, `etf_portfolio`, `etf_sh_basket`, `etf_sz_basket` |
+| Market activity | Margin data, block trades, top lists, institutional seats, shareholder activity | `margin`, `block_trade`, `top_list`, `top_inst`, `shareholders`, `holder_trade` |
+| Reference and alternative data | Security lists, industries, calendars, chip distribution, FX | `stock_list`, `industry_list`, `trade_calendar`, `chip_distribution`, `fx_daily` |
+| Live and research feeds | Real-time quotes, flash news, analyst reports | `realtime`, `news_flash`, `analyst_reports` |
+
+See the [API documentation](https://asharehub.com/en/docs) for endpoint-specific
+parameters, response schemas, and examples.
+
+## Common workflows
+
+### Compare an ETF with its benchmark
+
+```python
+with AShareHub(api_key=os.environ["ASHAREHUB_API_KEY"]) as client:
+    etf = client.etf_daily(symbol="510300.SH", start_date="20240101")
+    index = client.index_daily(symbol="000300.SH", start_date="20240101")
+```
+
+### Load financial statements
+
+```python
+with AShareHub(api_key=os.environ["ASHAREHUB_API_KEY"]) as client:
+    income = client.income(symbol="600519.SH", period="20241231")
+    balance_sheet = client.balance_sheet(symbol="600519.SH", period="20241231")
+    cash_flow = client.cash_flow(symbol="600519.SH", period="20241231")
+```
+
+### Explore a concept sector and its constituents
+
+```python
+with AShareHub(api_key=os.environ["ASHAREHUB_API_KEY"]) as client:
+    sectors = client.concepts(name="AI")
+    members = client.concept_members(
+        symbol="BK0425.DC",
+        con_symbol="000001.SZ",
+    )
+```
+
+### Fetch real-time quotes
+
+```python
+with AShareHub(api_key=os.environ["ASHAREHUB_API_KEY"]) as client:
+    quotes = client.realtime(symbol="000001.SZ,600519.SH,510300.SH")
+```
+
+## Data conventions
+
+### Instrument codes
+
+Public instrument fields use one stable naming contract:
+
+- Use `symbol` for the primary stock, index, Eastmoney sector, ETF, or other
+  instrument code.
+- Use `con_symbol` when a request or record contains a second constituent
+  security.
+- Use suffixed codes such as `000001.SZ`, `600519.SH`, `000300.SH`,
+  `510300.SH`, or `BK0425.DC`.
+
+This convention is shared by the REST API, Python SDK, MCP server, public
+documentation, and packaged contract.
+
+### Dates and results
+
+- Dates use `YYYYMMDD`, for example `20240819`.
+- The default `v2` client returns public fields such as `symbol` and native JSON
+  numbers.
+- Every method returns a DataFrame; no rows means `df.empty == True`.
+- Method signatures vary intentionally. Use the contract or endpoint docs for
+  the exact filters supported by each method.
+
+### Inspect the public contract
+
+The package includes the authoritative SDK/MCP method signatures, request
+parameters, and response fields:
+
+```python
+from asharehub import PUBLIC_CONTRACT, get_contract
 
 daily_contract = get_contract("market_daily")
+print(daily_contract["request_parameters"])
 print(daily_contract["response_fields"])
+print(PUBLIC_CONTRACT["version"])
 ```
 
-### Market Data
+## Client configuration
+
+Use the client as a context manager when possible so the underlying HTTP
+connection is closed automatically:
 
 ```python
-df = client.market_daily(symbol="000001.SZ", start_date="20240101")
-df = client.fundamentals(symbol="000001.SZ", start_date="20240101")
-df = client.margin(symbol="000001.SZ")
-df = client.block_trade(symbol="000001.SZ")
-df = client.top_list()
-df = client.shareholders(symbol="000001.SZ")
-df = client.holder_trade(symbol="000001.SZ")
-df = client.concepts()
-df = client.concept_members(symbol="BK0425.DC", con_symbol="000001.SZ")
-df = client.adj_factor(symbol="000001.SZ")
-df = client.technical_factors(symbol="000001.SZ")
-df = client.limit_list(limit_type="U")
+with AShareHub(
+    api_key=os.environ["ASHAREHUB_API_KEY"],
+    timeout=60.0,
+) as client:
+    data = client.market_daily(symbol="000001.SZ")
 ```
 
-### Capital Flows
-
-```python
-df = client.moneyflow_hsgt(start_date="20240101")
-df = client.moneyflow(symbol="000001.SZ")
-df = client.northbound_holdings(symbol="000001.SZ")
-```
-
-### Financials
-
-```python
-df = client.financial_indicators(symbol="000001.SZ")
-df = client.income(symbol="000001.SZ")
-df = client.balance_sheet(symbol="000001.SZ")
-df = client.cash_flow(symbol="000001.SZ")
-df = client.forecast(symbol="000001.SZ")
-df = client.express(symbol="000001.SZ")
-df = client.dividend(symbol="000001.SZ")
-```
-
-### Indices
-
-```python
-df = client.index_daily(symbol="000300.SH", start_date="20240101")
-df = client.index_weight(symbol="399300.SZ")
-```
-
-### ETFs
-
-```python
-df = client.etf_basic(list_status="L")
-df = client.etf_indices()
-df = client.etf_daily(symbol="510300.SH", start_date="20260101")
-df = client.etf_adj_factor(symbol="510300.SH", start_date="20260101")
-df = client.etf_share_size(symbol="510300.SH", start_date="20260101")
-df = client.etf_nav(symbol="510300.SH", start_date="20260101")
-df = client.etf_portfolio(symbol="510300.SH", period="20260331")
-```
-
-### Other
-
-```python
-df = client.chip_distribution(symbol="000001.SZ")
-df = client.fx_daily(symbol="USDCNH.FXCM")
-```
-
-### Reference Data
-
-```python
-df = client.stock_list()
-df = client.industry_list()
-df = client.trade_calendar(exchange="SSE", start_date="20240101")
-```
-
----
-
-## Common Parameters
-
-Most instrument/date-series methods accept some or all of the following. Use
-`get_contract(method)` for the exact signature; market-wide, reference, news and
-calendar interfaces intentionally differ.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `symbol` | str | Suffixed stock/index/ETF code, e.g. `000001.SZ` |
-| `start_date` | str | Start date, `YYYYMMDD` |
-| `end_date` | str | End date, `YYYYMMDD` |
-
----
-
-## Common Index Codes
-
-| Code | Name |
-|------|------|
-| `000001.SH` | SSE Composite (上证综指) |
-| `000300.SH` | CSI 300 (沪深300) |
-| `399001.SZ` | SZSE Component (深证成指) |
-| `399006.SZ` | ChiNext (创业板指) |
-| `000016.SH` | SSE 50 (上证50) |
-
----
-
-## Authentication
-
-Get your free API key:
-
-1. Visit [asharehub.com/en/console/register](https://asharehub.com/en/console/register)
-2. Create an account
-3. Generate your API key in the dashboard
-
-**Free tier includes 100 API calls per day.**
-
----
-
-## Error Handling
-
-```python
-from asharehub import AShareHub
-import httpx
-
-client = AShareHub(api_key="your_key")
-
-try:
-    df = client.market_daily(symbol="000001.SZ")
-except httpx.HTTPStatusError as e:
-    if e.response.status_code == 401:
-        print("Invalid API key")
-    elif e.response.status_code == 429:
-        print("Rate limit exceeded")
-    else:
-        print(f"HTTP error: {e}")
-```
-
----
-
-## Advanced Usage
-
-### Context Manager
-
-```python
-with AShareHub(api_key="your_key") as client:
-    df = client.market_daily(symbol="000001.SZ")
-    # Client automatically closes when exiting context
-```
-
-### Custom Base URL
+For development or a compatible deployment, provide a custom base URL:
 
 ```python
 client = AShareHub(
-    api_key="your_key",
-    base_url="https://custom.api.url",
-    timeout=60.0
+    api_key=os.environ["ASHAREHUB_API_KEY"],
+    base_url="https://your-api.example.com",
 )
 ```
 
----
+The client targets API `v2` by default. Existing integrations can explicitly
+select the legacy response surface with `version="v1"`; public SDK method
+parameters continue to use `symbol`.
 
-## Rate Limits
+## Error handling
 
-| Plan | Price | Daily Limit |
-|------|-------|-------------|
-| Free | $0 | 100 requests |
-| Pro | $49/month | 10,000 requests |
-| Business | $99/month | 50,000 requests |
+HTTP errors are raised as `httpx.HTTPStatusError`, so standard httpx handling
+works without an SDK-specific exception hierarchy:
 
----
+```python
+import httpx
 
-## Support
+try:
+    data = client.market_daily(symbol="000001.SZ")
+except httpx.HTTPStatusError as exc:
+    if exc.response.status_code == 401:
+        print("Check your API key")
+    elif exc.response.status_code == 429:
+        print("Rate limit reached")
+    else:
+        raise
+```
 
-- [Documentation](https://asharehub.com/en/docs)
-- [MCP & Agent Skill](https://asharehub.com/en/skill)
-- [Report Issues](https://github.com/ChuYiCui1/AshareHub/issues)
-- Email: support@asharehub.com
+## Authentication and usage limits
 
----
+Requests authenticate through the `X-API-Key` header, which the SDK configures
+from the `api_key` argument. A free tier is available; current quotas and paid
+plans are maintained on the [pricing page](https://asharehub.com/en/console/pricing).
+
+Never commit API keys to a repository, notebook, image, or issue report.
+
+## Documentation and ecosystem
+
+| Resource | Use it for |
+|---|---|
+| [Python SDK guide](https://asharehub.com/en/docs/sdk-install) | Installation and the first authenticated request |
+| [REST API documentation](https://asharehub.com/en/docs) | Endpoint reference, schemas, authentication, and limits |
+| [A-share market data](https://asharehub.com/en/docs/market-daily) | Prices, volume, adjustment factors, and trading data |
+| [ETF data](https://asharehub.com/en/docs/etf-basic) | ETF reference data, prices, NAV, shares, portfolios, and baskets |
+| [Financial data](https://asharehub.com/en/docs/financials) | Statements, indicators, forecasts, and dividends |
+| [MCP server](https://asharehub.com/en/docs/mcp-setup) | Connecting MCP-compatible clients and AI agents |
+| [Agent Skill](https://asharehub.com/en/skill) | Guided AShareHub workflows for coding agents |
+
+## Development
+
+Clone the repository and install the package in editable mode:
+
+```bash
+git clone https://github.com/ChuYiCui1/AshareHub.git
+cd AShareHub
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+pytest -q
+```
+
+Tests that require a live API are skipped unless both environment variables are
+set. When an API server is available, run the integration suite with:
+
+```bash
+ASHAREHUB_API_KEY="ash_your_key_here" \
+ASHAREHUB_BASE_URL="http://localhost:8000" \
+pytest -v
+```
+
+## Contributing
+
+Issues and pull requests are welcome. Before opening a change:
+
+1. Search [existing issues](https://github.com/ChuYiCui1/AshareHub/issues) for
+   related work.
+2. Keep the public `symbol` / `con_symbol` compatibility contract intact.
+3. Add or update tests for behavior changes.
+4. Run `pytest -q` and describe the user-visible impact in the pull request.
+
+For questions, bug reports, or endpoint requests, open a
+[GitHub issue](https://github.com/ChuYiCui1/AshareHub/issues).
+
+## Releases and support
+
+- Install releases from [PyPI](https://pypi.org/project/asharehub/).
+- Review version history on [GitHub Releases](https://github.com/ChuYiCui1/AshareHub/releases).
+- Read the [documentation](https://asharehub.com/en/docs).
+- Contact `support@asharehub.com` for account or service support.
 
 ## License
 
-MIT License - see the [LICENSE](LICENSE) file for details.
+The SDK is available under the [MIT License](LICENSE).
+
+## Disclaimer
+
+AShareHub provides data access tooling, not investment advice. Verify data,
+licensing requirements, and applicable terms before using it in research,
+production systems, or trading decisions.
 
 ---
 
