@@ -18,6 +18,16 @@
 
 AShareHub provides Chinese A-share and ETF market data through a simple, modern Python SDK.
 
+### Documentation by use case
+
+- [China stock data Python SDK](https://asharehub.com/en/docs/sdk-install) — installation and first authenticated request
+- [Hosted China market data API](https://asharehub.com/en/docs) — REST API coverage and endpoint reference
+- [China stock MCP server](https://asharehub.com/en/docs/mcp-setup) — connect AI agents and MCP-compatible clients
+- [A-share market data API](https://asharehub.com/en/docs/market-daily) — daily prices, volume and trading data
+- [China ETF data API](https://asharehub.com/en/docs/etf-basic) — ETF reference data, prices, NAV, shares and portfolios
+- [China financial data API](https://asharehub.com/en/docs/financials) — statements, indicators, forecasts and dividends
+- [China stock API pricing](https://asharehub.com/en/console/pricing), [authentication](https://asharehub.com/en/docs#authentication) and [rate limits](https://asharehub.com/en/docs#rate-limits)
+
 **Key Features:**
 - Returns `pd.DataFrame` — same convention as Tushare
 - 47 data endpoints covering A-shares, ETFs, financials, real-time, news, and reference data
