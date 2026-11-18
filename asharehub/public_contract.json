@@ -1393,6 +1393,71 @@
         "importance",
         "url"
       ]
+    },
+    "institutional_surveys": {
+      "rest_path": "/v2/research/institutional-surveys",
+      "mcp_tool": "get_institutional_surveys",
+      "request_parameters": [
+        "symbol",
+        "start_date",
+        "end_date",
+        "event_id",
+        "rece_org",
+        "include_content",
+        "limit",
+        "offset"
+      ],
+      "response_fields": [
+        "event_id",
+        "symbol",
+        "name",
+        "surv_date",
+        "rece_place",
+        "rece_mode",
+        "comp_rece",
+        "participant_count",
+        "content"
+      ]
+    },
+    "survey_participants": {
+      "rest_path": "/v2/research/survey-participants",
+      "mcp_tool": "get_survey_participants",
+      "request_parameters": [
+        "symbol",
+        "start_date",
+        "end_date",
+        "event_id",
+        "rece_org",
+        "org_type",
+        "limit",
+        "offset"
+      ],
+      "response_fields": [
+        "participant_id",
+        "event_id",
+        "symbol",
+        "surv_date",
+        "fund_visitors",
+        "rece_org",
+        "org_type"
+      ]
+    },
+    "broker_recommendations": {
+      "rest_path": "/v2/research/broker-recommendations",
+      "mcp_tool": "get_broker_recommendations",
+      "request_parameters": [
+        "symbol",
+        "month",
+        "broker",
+        "limit",
+        "offset"
+      ],
+      "response_fields": [
+        "month",
+        "broker",
+        "symbol",
+        "name"
+      ]
     }
   }
 }
