@@ -318,3 +318,5 @@ V2 only: `institutional_surveys`, `survey_participants`, and `broker_recommendat
 events = client.institutional_surveys(start_date="20261101", limit=100)
 picks = client.broker_recommendations(month="202611", limit=1000)
 ```
+
+Neither dataset exposes a reliable public release timestamp. `month` labels a recommendation month; `surv_date` records the meeting date, not when its transcript became public. Do not use either date alone for strict point-in-time backtests: doing so can introduce look-ahead bias. Such backtests require independently verified publication/availability timestamps and historical source versions.
