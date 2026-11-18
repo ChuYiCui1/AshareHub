@@ -16,6 +16,9 @@ from asharehub.contract import PUBLIC_CONTRACT
 
 
 _MODEL_NAMES = {
+    "institutional_surveys": "ResearchEvent",
+    "survey_participants": "ResearchParticipant",
+    "broker_recommendations": "BrokerRecommendation",
     "market_daily": "DailyBar",
     "fundamentals": "Fundamentals",
     "moneyflow_hsgt": "MoneyflowHsgt",

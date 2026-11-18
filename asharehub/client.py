@@ -60,6 +60,7 @@ class AShareHub:
 
     # 已知的字符串列，不做数值转换
     _STR_COLS = {
+        "rece_place", "rece_mode", "comp_rece", "month", "event_id", "participant_id", "surv_date", "content", "fund_visitors", "rece_org", "org_type", "broker",
         "ts_code", "trade_date", "end_date", "ann_date", "f_ann_date",
         "report_date", "cal_date", "pretrade_date", "record_date",
         "ex_date", "pay_date", "div_listdate", "imp_ann_date",
@@ -845,4 +846,73 @@ class AShareHub:
         return self._get("/v1/news/flash", {
             "source": source, "start_date": start_date, "end_date": end_date,
             "importance": importance,
+        })
+
+    def institutional_surveys(
+        self,
+        symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        event_id: Optional[str] = None,
+        rece_org: Optional[str] = None,
+        include_content: bool = False,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """One row per research event. Full transcript requires include_content=True and limit<=20. V2 only; offset pages ordered deterministically."""
+        if self._version != "v2":
+            raise ValueError("institutional_surveys requires version='v2'")
+        return self._get("/v2/research/institutional-surveys", {
+            "symbol": symbol,
+            "start_date": start_date,
+            "end_date": end_date,
+            "event_id": event_id,
+            "rece_org": rece_org,
+            "include_content": include_content,
+            "limit": limit,
+            "offset": offset,
+        })
+
+    def survey_participants(
+        self,
+        symbol: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        event_id: Optional[str] = None,
+        rece_org: Optional[str] = None,
+        org_type: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Participant records; these are not independent research events. Filter by event_id from institutional_surveys. V2 only; offset pages ordered deterministically."""
+        if self._version != "v2":
+            raise ValueError("survey_participants requires version='v2'")
+        return self._get("/v2/research/survey-participants", {
+            "symbol": symbol,
+            "start_date": start_date,
+            "end_date": end_date,
+            "event_id": event_id,
+            "rece_org": rece_org,
+            "org_type": org_type,
+            "limit": limit,
+            "offset": offset,
+        })
+
+    def broker_recommendations(
+        self,
+        symbol: Optional[str] = None,
+        month: Optional[str] = None,
+        broker: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> pd.DataFrame:
+        """Monthly broker stock picks (YYYYMM), distinct from analyst earnings forecasts. V2 only; offset pages ordered deterministically."""
+        if self._version != "v2":
+            raise ValueError("broker_recommendations requires version='v2'")
+        return self._get("/v2/research/broker-recommendations", {
+            "symbol": symbol,
+            "month": month,
+            "broker": broker,
+            "limit": limit,
+            "offset": offset,
         })

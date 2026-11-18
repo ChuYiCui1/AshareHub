@@ -309,3 +309,12 @@ production systems, or trading decisions.
 [asharehub.com](https://asharehub.com)
 
 </div>
+
+### Institutional research and monthly stock picks (0.10.0+)
+
+V2 only: `institutional_surveys`, `survey_participants`, and `broker_recommendations` return DataFrames with explicit `limit=100, offset=0` pagination. Event rows do not duplicate transcripts per institution. Fetch full text with `include_content=True, limit=20` or less. Participant counts represent stored records, not unique institutions. Monthly broker picks use `month="YYYYMM"` and differ from analyst earnings forecasts.
+
+```python
+events = client.institutional_surveys(start_date="20261101", limit=100)
+picks = client.broker_recommendations(month="202611", limit=1000)
+```

@@ -34,7 +34,7 @@ def client():
 
 
 def test_sdk_version():
-    assert __version__ == "0.9.0"
+    assert __version__ == "0.10.0"
 
 
 def test_unreleased_hk_market_methods_are_not_public():
@@ -55,7 +55,7 @@ def test_concept_methods_keep_public_symbol_contract():
 def test_machine_readable_contract_matches_sdk_methods_and_models():
     interfaces = PUBLIC_CONTRACT["interfaces"]
     assert PUBLIC_CONTRACT["version"] == "v2"
-    assert len(interfaces) == 47
+    assert len(interfaces) == 50
     assert set(MODEL_BY_METHOD) == set(interfaces)
 
     for method, entry in interfaces.items():
@@ -135,3 +135,28 @@ def test_etf_daily(client):
     assert len(df) > 0
     assert df.iloc[0]["symbol"] == "510300.SH"
     assert "close" in df.columns
+
+@pytest.mark.parametrize('method,args,path', [
+    ('institutional_surveys', {'event_id': 'a'*64, 'include_content': True, 'limit': 1, 'offset': 2}, 'institutional-surveys'),
+    ('survey_participants', {'rece_org': '甲机构', 'org_type': '基金', 'limit': 2}, 'survey-participants'),
+    ('broker_recommendations', {'month': '202611', 'broker': '券商甲'}, 'broker-recommendations'),
+])
+def test_research_request_serialization(method, args, path):
+    import httpx
+    seen = []
+    def handle(request):
+        seen.append(request)
+        return httpx.Response(200, json=[{'month': '202611', 'event_id': '1'*64, 'content': '12345', 'symbol': '000001.SZ'}])
+    with AShareHub(api_key='test') as client:
+        client._client.close()
+        client._client = httpx.Client(base_url='https://test', transport=httpx.MockTransport(handle))
+        frame = getattr(client, method)(**args)
+    assert seen[0].url.path == '/v2/research/' + path
+    for name, value in args.items():
+        assert seen[0].url.params[name] == (str(value).lower() if isinstance(value, bool) else str(value))
+    assert frame.iloc[0]['month'] == '202611'
+    assert frame.iloc[0]['event_id'] == '1'*64
+    assert frame.iloc[0]['content'] == '12345'
+    with AShareHub(api_key='test', version='v1') as client:
+        with pytest.raises(ValueError, match='requires version'):
+            getattr(client, method)(**args)
